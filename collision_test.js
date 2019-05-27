@@ -90,6 +90,32 @@ class Paddle{
     }
 }
 
+class Game{
+    constructor(){
+	this.p1 = new Paddle(1.5);
+	this.p1.x = 7;
+	this.p2 = new Paddle(1.5);
+	this.p2.x = -7;
+
+	this.disk = new Disk(1);
+	this.disk.dx = 1.0;
+	
+	this.right =  new Border(10, "v");
+	this.left = new Border(-10, "v");
+	this.top = new Border(15, "o");
+	this.bottom = new Border(-15, "o");
+
+	this.obstacles = [];
+	this.obstacles.push(this.p1);
+	this.obstacles.push(this.p2);
+	this.obstacles.push(this.right);
+	this.obstacles.push(this.left);
+	this.obstacles.push(this.top);
+	this.obstacles.push(this.bottom);
+    }
+
+}
+
 function rotation2(a){
     return [Math.cos(a), -Math.sin(a),
 	    Math.sin(a), Math.cos(a)];
@@ -99,28 +125,6 @@ function multiply2mv(m,v){
     return [m[0]*v[0] + m[1]*v[1], m[2]*v[0] + m[3]*v[1]];
 }
 
-var borders = [];
-borders.push( new Border(10, "v"));
-borders.push( new Border(-10, "v"));
-borders.push( new Border(15, "o"));
-borders.push( new Border(-15, "o"));
-var p = new Paddle(1.5);
-p.x = 3;
-p.y = -3;
 
-var d = new Disk(1);
-d.dx = 0.25;
-d.dy = -0.25;
 
-window.addEventListener("keydown", action, false);
 
-function action(e){
-    if(e.keyCode == 32){
-	d.step();
-	p.check(d);
-	borders.forEach(
-	    function(b){
-		b.check(d);
-	    });
-    }
-}
