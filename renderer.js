@@ -9,8 +9,8 @@ in vec4 inColor;
 in vec3 a_normal;
 out vec3 normal;
 out vec4 varColor;
-uniform mat4 mat;
-uniform mat4 mat_n;
+uniform mat4 mat; //world-view-projection-matrix
+uniform mat4 mat_n; //normal arrays
 
 // all shaders have a main function
 void main() {
@@ -20,9 +20,9 @@ void main() {
   
   varColor = inColor;
 
-  normal = mat3(mat_n)*a_normal;
+  normal = mat3(mat_n)*a_normal; //to turn normal arrays in the right position
 
-  gl_Position = mat * vec4(a_position.xyz, 1);
+  gl_Position = mat * vec4(a_position.xyz, 1); //exact position of the vertex on the screen in the canvas
 
 }
 `;
@@ -38,9 +38,9 @@ out vec4 outColor;
 in vec4 varColor;
 
 in vec3 normal;
-vec3 Ldir = normalize(vec3(0.1,0.3,1.0));
+vec3 Ldir = normalize(vec3(0.1,0.3,1.0)); //coordinates of the light
 void main() {
-  vec4 temp = varColor*clamp(dot(Ldir,normal),0.0,1.0);
+  vec4 temp = varColor*clamp(dot(Ldir,normal),0.0,1.0); //calculates the amount of light of the pixel
   outColor = vec4(temp.xyz, 1.0);
 
 }
@@ -76,13 +76,13 @@ function createProgram(gl, vertexShader, fragmentShader) {
   return undefined;
 }
 
-function setVao(gl, vectors, program, vao){
+function setVao(gl, vectors, program, vao){ //vao is the container of buffers for a single object
     var vertices = vectors[0];
     var indices = vectors[1];
     var colors = vectors[2];
     var normals = vectors[3];
 
-
+    //turn on vao
     gl.bindVertexArray(vao);
 
      var colorLocation = gl.getAttribLocation(program, "inColor");

@@ -93,12 +93,12 @@ class Paddle{
 class Game{
     constructor(){
 	this.p1 = new Paddle(1.5);
-	this.p1.x = 7;
+	this.p1.y = 12;
 	this.p2 = new Paddle(1.5);
-	this.p2.x = -7;
+	this.p2.y = -12;
 
 	this.disk = new Disk(1);
-	this.disk.dx = 1.0;
+	this.disk.dy = 1.0;
 	
 	this.right =  new Border(10, "v");
 	this.left = new Border(-10, "v");
