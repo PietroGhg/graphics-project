@@ -2,27 +2,27 @@
 
 var vertexShaderSource = `#version 300 es
 
-// an attribute is an input (in) to a vertex shader.
-// It will receive data from a buffer
+// an attribute is an input (in) to a vertex shader
+// it will receive data from a buffer
 in vec3 a_position;
 in vec4 inColor;
 in vec3 a_normal;
 out vec3 normal;
 out vec4 varColor;
-uniform mat4 mat; //world-view-projection-matrix
-uniform mat4 mat_n; //normal arrays
+uniform mat4 mat; // world-view-projection-matrix
+uniform mat4 mat_n; // normal arrays
 
 // all shaders have a main function
 void main() {
 
-  // gl_Position is a special variable a vertex shader
-  // is responsible for setting
-  
-  varColor = inColor;
+// gl_Position is a special variable a vertex shader
+// is responsible for setting
 
-  normal = mat3(mat_n)*a_normal; //to turn normal arrays in the right position
+varColor = inColor;
 
-  gl_Position = mat * vec4(a_position.xyz, 1); //exact position of the vertex on the screen in the canvas
+normal = mat3(mat_n)*a_normal; // to turn normal arrays in the right position
+
+gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on the screen in the canvas
 
 }
 `;
@@ -38,60 +38,60 @@ out vec4 outColor;
 in vec4 varColor;
 
 in vec3 normal;
-vec3 Ldir = normalize(vec3(0.1,0.3,1.0)); //coordinates of the light
+vec3 Ldir = normalize(vec3(0.1,0.3,1.0)); // coordinates of the light
 void main() {
-  vec4 temp = varColor*clamp(dot(Ldir,normal),0.0,1.0); //calculates the amount of light of the pixel
-  outColor = vec4(temp.xyz, 1.0);
+vec4 temp = varColor*clamp(dot(Ldir,normal),0.0,1.0); // calculates the amount of light of the pixel
+outColor = vec4(temp.xyz, 1.0);
 
 }
 `;
 
 
-function createShader(gl, type, source) {
-  var shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
+function createShader(gl, type, source){
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
     gl.compileShader(shader);
-  var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-  if (success) {
-    return shader;
-  }
-  
-  console.log(gl.getShaderInfoLog(shader));  // eslint-disable-line
-  gl.deleteShader(shader);
-  return undefined;
+    var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+    if (success){
+        return shader;
+    }
+
+    console.log(gl.getShaderInfoLog(shader));  // eslint-disable-line
+    gl.deleteShader(shader);
+    return undefined;
 }
 
-function createProgram(gl, vertexShader, fragmentShader) {
-  var program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (success) {
-    return program;
-  }
+function createProgram(gl, vertexShader, fragmentShader){
+    var program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+    if (success){
+        return program;
+    }
 
-  console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
-  gl.deleteProgram(program);
-  return undefined;
+    console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
+    gl.deleteProgram(program);
+    return undefined;
 }
 
-function setVao(gl, vectors, program, vao){ //vao is the container of buffers for a single object
+function setVao(gl, vectors, program, vao){ // vao is the container of buffers for a single object
     var vertices = vectors[0];
     var indices = vectors[1];
     var colors = vectors[2];
     var normals = vectors[3];
 
-    //turn on vao
+    // turn on vao
     gl.bindVertexArray(vao);
 
-     var colorLocation = gl.getAttribLocation(program, "inColor");
+    var colorLocation = gl.getAttribLocation(program, "inColor");
     var colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
     gl.enableVertexAttribArray(colorLocation);
     gl.vertexAttribPointer(colorLocation, 4, gl.FLOAT, false, 0,0);
-    
+
     var vertexBuffer = gl.createBuffer();
     var vertexLocation = gl.getAttribLocation(program, "a_position");
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -99,12 +99,10 @@ function setVao(gl, vectors, program, vao){ //vao is the container of buffers fo
     gl.enableVertexAttribArray(vertexLocation);
     gl.vertexAttribPointer(vertexLocation, 3, gl.FLOAT, false, 0,0);
 
-
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     indices = new Uint16Array(indices);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
 
     var normalsBuffer = gl.createBuffer();
     var normalLocation = gl.getAttribLocation(program, "a_normal");
@@ -117,73 +115,71 @@ function setVao(gl, vectors, program, vao){ //vao is the container of buffers fo
 }
 
 function drawVao(gl, vao, program, mat, mat_n, count){
-    	// Bind the attribute/buffer set we want.
-	gl.useProgram(program);
-	gl.bindVertexArray(vao);
+    // Bind the attribute/buffer set we want
+    gl.useProgram(program);
+    gl.bindVertexArray(vao);
 
-	var matLocation = gl.getUniformLocation(program, "mat"); 
+    var matLocation = gl.getUniformLocation(program, "mat");
     gl.uniformMatrix4fv(matLocation, true, mat);
 
     var mat_nLocation = gl.getUniformLocation(program, "mat_n");
     gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
-    
 
-        gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 0);
 }
 
 class Drawable{
+
     constructor(gl, vao, program, proj, view, world, count, obj){
-	this.gl = gl;
-	this.vao = vao;
-	this.program = program;
-	this.proj = proj;
-	this.view = view;
-	this.world = world;
-	this.count = count;
-	this.obj = obj;
+        this.gl = gl;
+        this.vao = vao;
+        this.program = program;
+        this.proj = proj;
+        this.view = view;
+        this.world = world;
+        this.count = count;
+        this.obj = obj;
     }
 
     draw(){
-	this.world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), utils.identityMatrix()); 
-	var gl = this.gl;
-	gl.useProgram(this.program);
-	gl.bindVertexArray(this.vao);
-	
-	var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(this.view, this.world));
-	var mat_n = utils.transposeMatrix( utils.invertMatrix(this.world));
-	
-	var matLocation = gl.getUniformLocation(this.program, "mat");
-	gl.uniformMatrix4fv(matLocation, true, mat);
-	
-	var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
-	gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
-	console.log(this.world); 
+        this.world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), utils.identityMatrix());
+        var gl = this.gl;
+        gl.useProgram(this.program);
+        gl.bindVertexArray(this.vao);
 
-	gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(this.view, this.world));
+        var mat_n = utils.transposeMatrix( utils.invertMatrix(this.world));
+
+        var matLocation = gl.getUniformLocation(this.program, "mat");
+        gl.uniformMatrix4fv(matLocation, true, mat);
+
+        var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
+        gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
+        console.log(this.world);
+
+        gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
-	
+
 }
 
 function clear(gl){
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-	gl.clearColor(0.0, 0.0, 0.0, 0.0);  // Clear to black, fully opaque
-	gl.clearDepth(1.0);                 // Clear everything
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-	gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);  // Clear to black, fully opaque
+    gl.clearDepth(1.0);                 // Clear everything
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+    gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 }
 
 function initGraphics(game){
-      // Get A WebGL context
-
     var canvas = document.getElementById("c");
 
+    // Get A WebGL context
     var gl = canvas.getContext("webgl2");
 
     if (!gl) {
-	return;
+        return;
     }
-
 
     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -211,8 +207,6 @@ function initGraphics(game){
     d3.draw();
 
     return [gl, [d1,d2,d3]];
-
-    
 }
 
 var game = new Game();
@@ -223,23 +217,178 @@ var todraw;
 window.addEventListener("keydown", action, false);
 
 function action(e){
+
     if(e.keyCode == 32){
-	game.disk.x = game.disk.x + game.disk.dx;
-	game.disk.y = game.disk.y + game.disk.dy;
-	console.log("disk " + game.disk.x + " " + game.disk.y);
-	console.log("p1 " + game.p1.x + " " + game.p1.y);
-	console.log("p2 " + game.p2.x + " " + game.p2.y);
+        game.disk.x = game.disk.x + game.disk.dx;
+        game.disk.y = game.disk.y + game.disk.dy;
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
 
-	game.obstacles.forEach(
-	    function(b){
-		b.check(game.disk);
-	    });
+        game.obstacles.forEach(
+            function(b){
+                b.check(game.disk);
+            });
 
-	clear(gl);
-	todraw.forEach(
-	    function(td){
-		td.draw();
-	    });
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
     }
-} 
 
+    // Pressing 'A' on the keybord p1 moves left
+    if(e.keyCode == 65){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the left border, otherwise the movement is allowed
+        if(game.p1.x - game.p1.radius <= game.borders[1].limit)
+            console.log("collision");
+        else
+            game.p1.x = game.p1.x - game.p1.dx;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'D' on the keybord p1 moves right
+    if(e.keyCode == 68){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the right border, otherwise the movement is allowed
+        if(game.p1.x + game.p1.radius >= game.borders[0].limit)
+            console.log("collision");
+        else
+            game.p1.x = game.p1.x + game.p1.dx;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'W' on the keybord p1 moves up
+    if(e.keyCode == 87){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
+        // TODO: Block the paddle in the middle
+        if(game.p1.y - game.p1.radius <= game.borders[3].limit)
+            console.log("collision");
+        else
+            game.p1.y = game.p1.y - game.p1.dy;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'S' on the keybord p1 moves down
+    if(e.keyCode == 83){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the bottom border, otherwise the movement is allowed
+        if(game.p1.y + game.p1.radius >= game.borders[2].limit)
+            console.log("collision");
+        else
+            game.p1.y = game.p1.y + game.p1.dy;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'J' on the keybord p2 moves left
+    if(e.keyCode == 74){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the left border, otherwise the movement is allowed
+        if(game.p2.x + game.p2.radius >= game.borders[0].limit)
+            console.log("collision");
+        else
+            game.p2.x = game.p2.x + game.p2.dx;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'L' on the keybord p2 moves right
+    if(e.keyCode == 76){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the right border, otherwise the movement is allowed
+        if(game.p2.x - game.p2.radius <= game.borders[1].limit)
+            console.log("collision");
+        else
+            game.p2.x = game.p2.x - game.p2.dx;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'I' on the keybord p2 moves up
+    if(e.keyCode == 73){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
+        // TODO: Block the paddle in the middle
+        if(game.p2.y + game.p2.radius >= game.borders[2].limit)
+            console.log("collision");
+        else
+            game.p2.y = game.p2.y + game.p2.dy;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+    // Pressing 'K' on the keybord p2 moves down
+    if(e.keyCode == 75){
+        console.log("disk " + game.disk.x + " " + game.disk.y);
+        console.log("p1 " + game.p1.x + " " + game.p1.y);
+        console.log("p2 " + game.p2.x + " " + game.p2.y);
+
+        // The paddle stops when encounters the bottom border, otherwise the movement is allowed
+        if(game.p2.y - game.p2.radius <= game.borders[3].limit)
+            console.log("collision");
+        else
+            game.p2.y = game.p2.y - game.p2.dy;
+
+        clear(gl);
+        todraw.forEach(
+            function(td){
+                td.draw();
+            });
+    }
+
+}
