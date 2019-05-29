@@ -209,15 +209,33 @@ function initGraphics(game){
     return [gl, [d1,d2,d3]];
 }
 
+function animate(gl, todraw){
+    game.disk.step();
+    game.obstacles.forEach(
+        function(b){
+            b.check(game.disk);
+        });
+
+    clear(gl);
+    todraw.forEach(
+        function(td){
+            td.draw();
+        });
+
+    window.requestAnimationFrame(function(){ animate(gl, todraw);});
+}
+
+    
+    
+
 var game = new Game();
 var gl;
 var todraw;
 [gl, todraw] = initGraphics(game);
-
+animate(gl, todraw);
 window.addEventListener("keydown", action, false);
 
 function action(e){
-
     if(e.keyCode == 32){
         game.disk.x = game.disk.x + game.disk.dx;
         game.disk.y = game.disk.y + game.disk.dy;
@@ -244,7 +262,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the left border, otherwise the movement is allowed
-        if(game.p1.x - game.p1.radius <= game.borders[1].limit)
+        if(game.p1.x - game.p1.radius <= game.borders[1].limit || checkDist(game.disk, game.p1))
             console.log("collision");
         else
             game.p1.x = game.p1.x - game.p1.dx;
@@ -263,7 +281,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the right border, otherwise the movement is allowed
-        if(game.p1.x + game.p1.radius >= game.borders[0].limit)
+        if(game.p1.x + game.p1.radius >= game.borders[0].limit || checkDist(game.disk, game.p1))
             console.log("collision");
         else
             game.p1.x = game.p1.x + game.p1.dx;
@@ -283,7 +301,7 @@ function action(e){
 
         // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
         // TODO: Block the paddle in the middle
-        if(game.p1.y - game.p1.radius <= game.borders[3].limit)
+        if(game.p1.y - game.p1.radius <= game.borders[3].limit || checkDist(game.disk, game.p1))
             console.log("collision");
         else
             game.p1.y = game.p1.y - game.p1.dy;
@@ -302,7 +320,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the bottom border, otherwise the movement is allowed
-        if(game.p1.y + game.p1.radius >= game.borders[2].limit)
+        if(game.p1.y + game.p1.radius >= game.borders[2].limit || checkDist(game.disk, game.p1))
             console.log("collision");
         else
             game.p1.y = game.p1.y + game.p1.dy;
@@ -321,7 +339,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the left border, otherwise the movement is allowed
-        if(game.p2.x + game.p2.radius >= game.borders[0].limit)
+        if(game.p2.x + game.p2.radius >= game.borders[0].limit || checkDist(game.disk, game.p2))
             console.log("collision");
         else
             game.p2.x = game.p2.x + game.p2.dx;
@@ -340,7 +358,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the right border, otherwise the movement is allowed
-        if(game.p2.x - game.p2.radius <= game.borders[1].limit)
+        if(game.p2.x - game.p2.radius <= game.borders[1].limit  || checkDist(game.disk, game.p2))
             console.log("collision");
         else
             game.p2.x = game.p2.x - game.p2.dx;
@@ -360,7 +378,7 @@ function action(e){
 
         // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
         // TODO: Block the paddle in the middle
-        if(game.p2.y + game.p2.radius >= game.borders[2].limit)
+        if(game.p2.y + game.p2.radius >= game.borders[2].limit  || checkDist(game.disk, game.p2))
             console.log("collision");
         else
             game.p2.y = game.p2.y + game.p2.dy;
@@ -379,7 +397,7 @@ function action(e){
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
         // The paddle stops when encounters the bottom border, otherwise the movement is allowed
-        if(game.p2.y - game.p2.radius <= game.borders[3].limit)
+        if(game.p2.y - game.p2.radius <= game.borders[3].limit  || checkDist(game.disk, game.p2))
             console.log("collision");
         else
             game.p2.y = game.p2.y - game.p2.dy;
@@ -391,4 +409,10 @@ function action(e){
             });
     }
 
+}
+
+//returns true when paddle and disk collide
+function checkDist(disk, paddle){
+    var dist = Math.sqrt(Math.pow(disk.x - paddle.x, 2) + Math.pow(disk.y - paddle.y, 2));
+    return dist < (disk.radius + paddle.radius);
 }

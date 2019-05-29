@@ -108,16 +108,16 @@ class Game{
     constructor(){
         this.p1 = new Paddle(1.5);
         this.p1.y = 12;
-        this.p1.dx = 1.0;
-        this.p1.dy = 1.0;
+        this.p1.dx = 2.0;
+        this.p1.dy = 2.0;
 
         this.p2 = new Paddle(1.5);
         this.p2.y = -12;
-        this.p2.dx = 1.0;
-        this.p2.dy = 1.0;
+        this.p2.dx = 2.0;
+        this.p2.dy = 2.0;
 
         this.disk = new Disk(1);
-        this.disk.dy = 1.0;
+        this.disk.dy = 0.3;
 
         this.right =  new Border(10, "v");
         this.left = new Border(-10, "v");
