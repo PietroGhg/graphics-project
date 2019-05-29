@@ -11,6 +11,8 @@ class Disk{
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
+	this.dx = this.dx - 0.01*this.dx;
+	this.dy = this.dy - 0.01*this.dy;
         console.log("x:" + this.x + ", y:" +this.y);
     }
 
@@ -76,7 +78,7 @@ class Paddle{
 
     check(disk){
         //check if the distance between the centers is <= of the sum of the radiuses
-        var dist = Math.sqrt(Math.pow(disk.x - this.x, 2) + Math.pow(disk.y - this.y, 2));
+        var dist = Math.sqrt(Math.pow((disk.x + disk.dx) - (this.x + this.dx), 2) + Math.pow((disk.y + disk.dy) - (this.y + this.dy), 2));
         if(dist <= this.radius + disk.radius){
             console.log("collision with paddle");
             this.handleCollision(disk);
@@ -97,9 +99,11 @@ class Paddle{
         //bring back to the xy coordinates
         m = rotation2(-a);
         v = multiply2mv(m,v1);
+	
+	
         //update the disk
-        disk.dx = v[0];
-        disk.dy = v[1];
+        disk.dx = v[0] + this.dx;
+        disk.dy = v[1] + this.dy;
     }
 
 }
@@ -114,11 +118,11 @@ class Game{
 
         this.p2 = new Paddle(1.5);
         this.p2.y = -12;
-        this.p2.dx = 2.0;
-        this.p2.dy = 2.0;
+        this.p2.dx = 0.0;
+        this.p2.dy = 0.0;
 
         this.disk = new Disk(1);
-        this.disk.dy = 0.3;
+        this.disk.dy = 0.0;
 
         this.right =  new Border(10, "v");
         this.left = new Border(-10, "v");

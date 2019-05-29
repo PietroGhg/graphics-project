@@ -216,10 +216,27 @@ function animate(gl, todraw){
             b.check(game.disk);
         });
     
-    if(game.p1.x - game.p1.radius + game.p1.dx <= game.borders[1].limit || checkDist(game.disk, game.p1))
+    if( (game.p1.x - game.p1.radius + game.p1.dx <= game.borders[1].limit || checkDist(game.disk, game.p1)) ||
+	(game.p1.x + game.p1.radius + game.p1.dx >= game.borders[0].limit || checkDist(game.disk, game.p1)))
         console.log("collision");
     else
         game.p1.x = game.p1.x + game.p1.dx;
+    if( (game.p1.y - game.p1.radius + game.p1.dy <= game.borders[3].limit || checkDist(game.disk, game.p1)) ||
+	(game.p1.y + game.p1.radius + game.p1.dy >= game.borders[2].limit || checkDist(game.disk, game.p1)))
+        console.log("collision");
+    else
+	game.p1.y = game.p1.y + game.p1.dy;
+
+    if( (game.p2.x - game.p2.radius + game.p2.dx <= game.borders[1].limit || checkDist(game.disk, game.p2)) ||
+	(game.p2.x + game.p2.radius + game.p2.dx >= game.borders[0].limit || checkDist(game.disk, game.p2)))
+        console.log("collision");
+    else
+        game.p2.x = game.p2.x + game.p2.dx;
+    if( (game.p2.y - game.p2.radius + game.p2.dy <= game.borders[3].limit || checkDist(game.disk, game.p2)) ||
+	(game.p2.y + game.p2.radius + game.p2.dy >= game.borders[2].limit || checkDist(game.disk, game.p2)))
+        console.log("collision");
+    else
+	game.p2.y = game.p2.y + game.p2.dy;
     
     clear(gl);
     todraw.forEach(
@@ -242,179 +259,45 @@ window.addEventListener("keydown", action, false);
 window.addEventListener("keyup", release, false);
 
 function action(e){
-    /*if(e.keyCode == 32){
-        game.disk.x = game.disk.x + game.disk.dx;
-        game.disk.y = game.disk.y + game.disk.dy;
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        game.obstacles.forEach(
-            function(b){
-                b.check(game.disk);
-            });
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
-    }*/
 
     // Pressing 'A' on the keybord p1 moves left
     if(e.keyCode == 65){
-        /*console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the left border, otherwise the movement is allowed
-        if(game.p1.x - game.p1.radius <= game.borders[1].limit || checkDist(game.disk, game.p1))
-            console.log("collision");
-        else
-            game.p1.x = game.p1.x - game.p1.dx;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-		});*/
 	game.p1.dx = -game.p1.speed;
     }
 
     // Pressing 'D' on the keybord p1 moves right
     if(e.keyCode == 68){
-        /*console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the right border, otherwise the movement is allowed
-        if(game.p1.x + game.p1.radius >= game.borders[0].limit || checkDist(game.disk, game.p1))
-            console.log("collision");
-        else
-            game.p1.x = game.p1.x + game.p1.dx;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-		});*/
 	game.p1.dx = game.p1.speed;
     }
 
     // Pressing 'W' on the keybord p1 moves up
     if(e.keyCode == 87){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
-        // TODO: Block the paddle in the middle
-        if(game.p1.y - game.p1.radius <= game.borders[3].limit || checkDist(game.disk, game.p1))
-            console.log("collision");
-        else
-            game.p1.y = game.p1.y - game.p1.dy;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p1.dy = -game.p1.speed;
     }
 
     // Pressing 'S' on the keybord p1 moves down
     if(e.keyCode == 83){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the bottom border, otherwise the movement is allowed
-        if(game.p1.y + game.p1.radius >= game.borders[2].limit || checkDist(game.disk, game.p1))
-            console.log("collision");
-        else
-            game.p1.y = game.p1.y + game.p1.dy;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p1.dy = game.p1.speed;
     }
 
     // Pressing 'J' on the keybord p2 moves left
     if(e.keyCode == 74){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the left border, otherwise the movement is allowed
-        if(game.p2.x + game.p2.radius >= game.borders[0].limit || checkDist(game.disk, game.p2))
-            console.log("collision");
-        else
-            game.p2.x = game.p2.x + game.p2.dx;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p2.dx = game.p2.speed;
     }
 
     // Pressing 'L' on the keybord p2 moves right
     if(e.keyCode == 76){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the right border, otherwise the movement is allowed
-        if(game.p2.x - game.p2.radius <= game.borders[1].limit  || checkDist(game.disk, game.p2))
-            console.log("collision");
-        else
-            game.p2.x = game.p2.x - game.p2.dx;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p2.dx = -game.p2.speed;
     }
 
     // Pressing 'I' on the keybord p2 moves up
     if(e.keyCode == 73){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the middle of the table, otherwise the movement is allowed
-        // TODO: Block the paddle in the middle
-        if(game.p2.y + game.p2.radius >= game.borders[2].limit  || checkDist(game.disk, game.p2))
-            console.log("collision");
-        else
-            game.p2.y = game.p2.y + game.p2.dy;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p2.dy = -game.p2.speed;
     }
 
     // Pressing 'K' on the keybord p2 moves down
     if(e.keyCode == 75){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
-        console.log("p1 " + game.p1.x + " " + game.p1.y);
-        console.log("p2 " + game.p2.x + " " + game.p2.y);
-
-        // The paddle stops when encounters the bottom border, otherwise the movement is allowed
-        if(game.p2.y - game.p2.radius <= game.borders[3].limit  || checkDist(game.disk, game.p2))
-            console.log("collision");
-        else
-            game.p2.y = game.p2.y - game.p2.dy;
-
-        clear(gl);
-        todraw.forEach(
-            function(td){
-                td.draw();
-            });
+	game.p2.dy = game.p2.speed;
     }
 
 }
@@ -423,9 +306,18 @@ function release(e){
     if (e.keyCode == 65 || e.keyCode == 68){
 	game.p1.dx = 0;
     }
+    if (e.keyCode == 87 || e.keyCode == 83){
+	game.p1.dy = 0;
+    }
+    if (e.keyCode == 74 || e.keyCode == 76){
+	game.p2.dx = 0;
+    }
+    if (e.keyCode == 73 || e.keyCode == 75){
+	game.p2.dy = 0;
+    }
 }
 //returns true when paddle and disk collide
 function checkDist(disk, paddle){
-    var dist = Math.sqrt(Math.pow((disk.x+disk.dx) - (paddle.x+paddle.dx), 2) + Math.pow((disk.y+disk.dy) - (paddle.y+paddle.dy), 2));
-    return dist < (disk.radius + paddle.radius);
+    var dist = Math.sqrt(Math.pow((disk.x + disk.dx) - (paddle.x + paddle.dx), 2) + Math.pow((disk.y + disk.dy) - (paddle.y + paddle.dy), 2));
+    return dist <= (disk.radius + paddle.radius);
 }
