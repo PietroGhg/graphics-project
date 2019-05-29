@@ -65,6 +65,7 @@ class Paddle{
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
+	this.speed = 0.4;
     }
 
     step(){
@@ -108,8 +109,8 @@ class Game{
     constructor(){
         this.p1 = new Paddle(1.5);
         this.p1.y = 12;
-        this.p1.dx = 2.0;
-        this.p1.dy = 2.0;
+        this.p1.dx = 0;
+        this.p1.dy = 0;
 
         this.p2 = new Paddle(1.5);
         this.p2.y = -12;

@@ -215,7 +215,12 @@ function animate(gl, todraw){
         function(b){
             b.check(game.disk);
         });
-
+    
+    if(game.p1.x - game.p1.radius + game.p1.dx <= game.borders[1].limit || checkDist(game.disk, game.p1))
+        console.log("collision");
+    else
+        game.p1.x = game.p1.x + game.p1.dx;
+    
     clear(gl);
     todraw.forEach(
         function(td){
@@ -234,9 +239,10 @@ var todraw;
 [gl, todraw] = initGraphics(game);
 animate(gl, todraw);
 window.addEventListener("keydown", action, false);
+window.addEventListener("keyup", release, false);
 
 function action(e){
-    if(e.keyCode == 32){
+    /*if(e.keyCode == 32){
         game.disk.x = game.disk.x + game.disk.dx;
         game.disk.y = game.disk.y + game.disk.dy;
         console.log("disk " + game.disk.x + " " + game.disk.y);
@@ -253,11 +259,11 @@ function action(e){
             function(td){
                 td.draw();
             });
-    }
+    }*/
 
     // Pressing 'A' on the keybord p1 moves left
     if(e.keyCode == 65){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
+        /*console.log("disk " + game.disk.x + " " + game.disk.y);
         console.log("p1 " + game.p1.x + " " + game.p1.y);
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
@@ -271,12 +277,13 @@ function action(e){
         todraw.forEach(
             function(td){
                 td.draw();
-            });
+		});*/
+	game.p1.dx = -game.p1.speed;
     }
 
     // Pressing 'D' on the keybord p1 moves right
     if(e.keyCode == 68){
-        console.log("disk " + game.disk.x + " " + game.disk.y);
+        /*console.log("disk " + game.disk.x + " " + game.disk.y);
         console.log("p1 " + game.p1.x + " " + game.p1.y);
         console.log("p2 " + game.p2.x + " " + game.p2.y);
 
@@ -290,7 +297,8 @@ function action(e){
         todraw.forEach(
             function(td){
                 td.draw();
-            });
+		});*/
+	game.p1.dx = game.p1.speed;
     }
 
     // Pressing 'W' on the keybord p1 moves up
@@ -411,8 +419,13 @@ function action(e){
 
 }
 
+function release(e){
+    if (e.keyCode == 65 || e.keyCode == 68){
+	game.p1.dx = 0;
+    }
+}
 //returns true when paddle and disk collide
 function checkDist(disk, paddle){
-    var dist = Math.sqrt(Math.pow(disk.x - paddle.x, 2) + Math.pow(disk.y - paddle.y, 2));
+    var dist = Math.sqrt(Math.pow((disk.x+disk.dx) - (paddle.x+paddle.dx), 2) + Math.pow((disk.y+disk.dy) - (paddle.y+paddle.dy), 2));
     return dist < (disk.radius + paddle.radius);
 }
