@@ -1,4 +1,4 @@
-var maxV = 2; //cap to maximum velocity of the disk
+var maxV = 1.5; //cap to maximum velocity of the disk
 class Disk{
 
     constructor(radius){
@@ -14,6 +14,11 @@ class Disk{
         this.y = this.y + this.dy;
 	this.dx = this.dx - 0.01*this.dx;
 	this.dy = this.dy - 0.01*this.dy;
+    }
+
+    bump(){
+	this.dx = this.dx - 0.01*(this.dx > 0 ? 1 : -1);
+	this.dy = this.dy - 0.01*(this.dy > 0 ? 1 : -1);
     }
 
 }
@@ -51,6 +56,7 @@ class Border{
         else{
             disk.dx = -disk.dx;
         }
+	disk.bump();
     }
 
 }
@@ -94,11 +100,19 @@ class Paddle{
         m = rotation2(-a);
         v = multiply2mv(m,v1);
 	
-	
+	disk.bump();
         //update the disk
 	if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
             disk.dx = v[0] + this.dx;
             disk.dy = v[1] + this.dy;
+	}
+    }
+
+    normalizeSpeed(){
+	var len = Math.sqrt(Math.pow(this.dx, 2) + Math.pow(this.dy, 2));
+	if(len != 0){
+	    this.dx = this.speed*(this.dx/len);
+	    this.dy = this.speed*(this.dy/len);
 	}
     }
 
@@ -141,27 +155,33 @@ class Game{
     }
 
     checkColl(paddle){
-	if( (paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit || checkDist(this.disk, paddle)) ||
-	    (paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit || checkDist(this.disk, paddle)))
-            console.log("collision");
-	else
+	if( !(paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit ||
+	      checkDist(this.disk, paddle) ||
+	      paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit )){
+	    
             paddle.x = paddle.x + paddle.dx;
-	if( (paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit || checkDist(this.disk, paddle)) ||
-	    (paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit || checkDist(this.disk, paddle)))
-            console.log("collision");
-	else
+	}
+
+	
+	if( !(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
+	      checkDist(this.disk, paddle) ||
+	      paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){
+
 	    paddle.y = paddle.y + paddle.dy;
+	}
+	paddle.normalizeSpeed();
+	    
     }
 
     checkAndStep(){
-	this.disk.step();
+	this.checkColl(this.p1);
+	this.checkColl(this.p2);
 	this.obstacles.forEach(
             function(b){
 		b.check(this.disk);
             }, this);
 	
-	this.checkColl(this.p1);
-	this.checkColl(this.p2);
+	this.disk.step();
     }
 
 }
