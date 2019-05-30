@@ -1,3 +1,4 @@
+var maxV = 2; //cap to maximum velocity of the disk
 class Disk{
 
     constructor(radius){
@@ -13,7 +14,6 @@ class Disk{
         this.y = this.y + this.dy;
 	this.dx = this.dx - 0.01*this.dx;
 	this.dy = this.dy - 0.01*this.dy;
-        console.log("x:" + this.x + ", y:" +this.y);
     }
 
 }
@@ -28,21 +28,17 @@ class Border{
     check(disk){
         if(this.limit >= 0){
             if(this.direction == "v" && disk.x + disk.radius >= this.limit){
-                console.log("collision");
                 this.handleCollision(disk);
             }
             else if(this.direction == "h" && disk.y + disk.radius >= this.limit){
-                console.log("collision");
                 this.handleCollision(disk);
             }
         }
         else{
             if(this.direction == "v" && disk.x - disk.radius <= this.limit){
-                console.log("collision");
                 this.handleCollision(disk);
             }
             else if(this.direction == "h" && disk.y - disk.radius <= this.limit){
-                console.log("collision");
                 this.handleCollision(disk);
             }
         }
@@ -73,14 +69,12 @@ class Paddle{
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
-        console.log("x:" + this.x + ", y:" +this.y);
     }
 
     check(disk){
         //check if the distance between the centers is <= of the sum of the radiuses
         var dist = Math.sqrt(Math.pow((disk.x + disk.dx) - (this.x + this.dx), 2) + Math.pow((disk.y + disk.dy) - (this.y + this.dy), 2));
         if(dist <= this.radius + disk.radius){
-            console.log("collision with paddle");
             this.handleCollision(disk);
         }
     }
@@ -102,8 +96,10 @@ class Paddle{
 	
 	
         //update the disk
-        disk.dx = v[0] + this.dx;
-        disk.dy = v[1] + this.dy;
+	if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
+            disk.dx = v[0] + this.dx;
+            disk.dy = v[1] + this.dy;
+	}
     }
 
 }
@@ -144,6 +140,30 @@ class Game{
         this.borders.push(this.bottom);
     }
 
+    checkColl(paddle){
+	if( (paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit || checkDist(this.disk, paddle)) ||
+	    (paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit || checkDist(this.disk, paddle)))
+            console.log("collision");
+	else
+            paddle.x = paddle.x + paddle.dx;
+	if( (paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit || checkDist(this.disk, paddle)) ||
+	    (paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit || checkDist(this.disk, paddle)))
+            console.log("collision");
+	else
+	    paddle.y = paddle.y + paddle.dy;
+    }
+
+    checkAndStep(){
+	this.disk.step();
+	this.obstacles.forEach(
+            function(b){
+		b.check(this.disk);
+            }, this);
+	
+	this.checkColl(this.p1);
+	this.checkColl(this.p2);
+    }
+
 }
 
 function rotation2(a){
@@ -152,4 +172,10 @@ function rotation2(a){
 
 function multiply2mv(m,v){
     return [m[0]*v[0] + m[1]*v[1], m[2]*v[0] + m[3]*v[1]];
+}
+
+//returns true when paddle and disk collide
+function checkDist(disk, paddle){
+    var dist = Math.sqrt(Math.pow((disk.x + disk.dx) - (paddle.x + paddle.dx), 2) + Math.pow((disk.y + disk.dy) - (paddle.y + paddle.dy), 2));
+    return dist <= (disk.radius + paddle.radius);
 }

@@ -39,8 +39,9 @@ in vec4 varColor;
 
 in vec3 normal;
 vec3 Ldir = normalize(vec3(0.1,0.3,1.0)); // coordinates of the light
+vec4 Lcol = vec4(1.0,1.0,1.0,1.0);
 void main() {
-vec4 temp = varColor*clamp(dot(Ldir,normal),0.0,1.0); // calculates the amount of light of the pixel
+vec4 temp = varColor*Lcol*clamp(dot(Ldir,normal),0.0,1.0); // calculates the amount of light of the pixel
 outColor = vec4(temp.xyz, 1.0);
 
 }
@@ -154,7 +155,6 @@ class Drawable{
 
         var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
         gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
-        console.log(this.world);
 
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
@@ -222,33 +222,7 @@ function animate(gl, todraw, views){
     var view1 = views[0];
     var view2 = views[1];
     
-    game.disk.step();
-    game.obstacles.forEach(
-        function(b){
-            b.check(game.disk);
-        });
-    
-    if( (game.p1.x - game.p1.radius + game.p1.dx <= game.borders[1].limit || checkDist(game.disk, game.p1)) ||
-	(game.p1.x + game.p1.radius + game.p1.dx >= game.borders[0].limit || checkDist(game.disk, game.p1)))
-        console.log("collision");
-    else
-        game.p1.x = game.p1.x + game.p1.dx;
-    if( (game.p1.y - game.p1.radius + game.p1.dy <= game.borders[3].limit || checkDist(game.disk, game.p1)) ||
-	(game.p1.y + game.p1.radius + game.p1.dy >= game.borders[2].limit || checkDist(game.disk, game.p1)))
-        console.log("collision");
-    else
-	game.p1.y = game.p1.y + game.p1.dy;
-
-    if( (game.p2.x - game.p2.radius + game.p2.dx <= game.borders[1].limit || checkDist(game.disk, game.p2)) ||
-	(game.p2.x + game.p2.radius + game.p2.dx >= game.borders[0].limit || checkDist(game.disk, game.p2)))
-        console.log("collision");
-    else
-        game.p2.x = game.p2.x + game.p2.dx;
-    if( (game.p2.y - game.p2.radius + game.p2.dy <= game.borders[3].limit || checkDist(game.disk, game.p2)) ||
-	(game.p2.y + game.p2.radius + game.p2.dy >= game.borders[2].limit || checkDist(game.disk, game.p2)))
-        console.log("collision");
-    else
-	game.p2.y = game.p2.y + game.p2.dy;
+    game.checkAndStep();
     
     clear(gl);
     drawScene(gl, todraw, 0, view1);
@@ -327,8 +301,4 @@ function release(e){
 	game.p2.dy = 0;
     }
 }
-//returns true when paddle and disk collide
-function checkDist(disk, paddle){
-    var dist = Math.sqrt(Math.pow((disk.x + disk.dx) - (paddle.x + paddle.dx), 2) + Math.pow((disk.y + disk.dy) - (paddle.y + paddle.dy), 2));
-    return dist <= (disk.radius + paddle.radius);
-}
+
