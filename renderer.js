@@ -130,24 +130,23 @@ function drawVao(gl, vao, program, mat, mat_n, count){
 
 class Drawable{
 
-    constructor(gl, vao, program, proj, view, world, count, obj){
+    constructor(gl, vao, program, proj, world, count, obj){
         this.gl = gl;
         this.vao = vao;
         this.program = program;
         this.proj = proj;
-        this.view = view;
         this.world = world;
         this.count = count;
         this.obj = obj;
     }
 
-    draw(){
+    draw(view){
         this.world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), utils.identityMatrix());
         var gl = this.gl;
         gl.useProgram(this.program);
         gl.bindVertexArray(this.vao);
 
-        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(this.view, this.world));
+        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, this.world));
         var mat_n = utils.transposeMatrix( utils.invertMatrix(this.world));
 
         var matLocation = gl.getUniformLocation(this.program, "mat");
@@ -163,7 +162,6 @@ class Drawable{
 }
 
 function clear(gl){
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);  // Clear to black, fully opaque
     gl.clearDepth(1.0);                 // Clear everything
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -195,21 +193,35 @@ function initGraphics(game){
     var count3 = setVao(gl, createCil(0.5, game.disk.radius, [0.0,0.0,0.0,1.0]), program, vao_p3);
 
     var world = utils.identityMatrix();
-    var proj = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000);
-    var view = utils.MakeLookAt([0,30,20],[0,0,0],[0,1,0]);
+    var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
+    var view1 = utils.MakeLookAt([0,30,20],[0,0,0],[0,1,0]);
+    var view2 = utils.MakeLookAt([0,30,-20],[0,0,0],[0,1,0]);
 
     clear(gl);
-    var d1 = new Drawable(gl, vao_p1, program, proj, view, world, count, game.p1);
-    var d2 = new Drawable(gl, vao_p2, program, proj, view, world, count2, game.p2);
-    var d3 = new Drawable(gl, vao_p3, program, proj, view, world, count3, game.disk);
-    d1.draw();
-    d2.draw();
-    d3.draw();
-
-    return [gl, [d1,d2,d3]];
+    var d1 = new Drawable(gl, vao_p1, program, proj, world, count, game.p1);
+    var d2 = new Drawable(gl, vao_p2, program, proj, world, count2, game.p2);
+    var d3 = new Drawable(gl, vao_p3, program, proj, world, count3, game.disk);
+    var todraw = [d1,d2,d3];
+    drawScene(gl, todraw, 0, view1);
+    drawScene(gl, todraw, gl.canvas.width/2, view2);
+    var views = [view1, view2];
+    
+    return [gl, todraw, views];
 }
 
-function animate(gl, todraw){
+function drawScene(gl, todraw, x, view){
+    gl.viewport(x, 0, gl.canvas.width/2, gl.canvas.height);
+
+    todraw.forEach(
+        function(td){
+            td.draw(view);
+        });
+}
+
+function animate(gl, todraw, views){
+    var view1 = views[0];
+    var view2 = views[1];
+    
     game.disk.step();
     game.obstacles.forEach(
         function(b){
@@ -239,12 +251,10 @@ function animate(gl, todraw){
 	game.p2.y = game.p2.y + game.p2.dy;
     
     clear(gl);
-    todraw.forEach(
-        function(td){
-            td.draw();
-        });
+    drawScene(gl, todraw, 0, view1);
+    drawScene(gl, todraw, gl.canvas.width/2, view2);
 
-    window.requestAnimationFrame(function(){ animate(gl, todraw);});
+    window.requestAnimationFrame(function(){ animate(gl, todraw, views);});
 }
 
     
@@ -253,8 +263,9 @@ function animate(gl, todraw){
 var game = new Game();
 var gl;
 var todraw;
-[gl, todraw] = initGraphics(game);
-animate(gl, todraw);
+var views;
+[gl, todraw, views] = initGraphics(game);
+animate(gl, todraw, views);
 window.addEventListener("keydown", action, false);
 window.addEventListener("keyup", release, false);
 
@@ -292,12 +303,12 @@ function action(e){
 
     // Pressing 'I' on the keybord p2 moves up
     if(e.keyCode == 73){
-	game.p2.dy = -game.p2.speed;
+	game.p2.dy = game.p2.speed;
     }
 
     // Pressing 'K' on the keybord p2 moves down
     if(e.keyCode == 75){
-	game.p2.dy = game.p2.speed;
+	game.p2.dy = -game.p2.speed;
     }
 
 }
