@@ -142,12 +142,12 @@ class Drawable{
     }
 
     draw(view){
-        this.world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), utils.identityMatrix());
+        var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
         var gl = this.gl;
         gl.useProgram(this.program);
         gl.bindVertexArray(this.vao);
 
-        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, this.world));
+        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, temp_world));
         var mat_n = utils.transposeMatrix( utils.invertMatrix(this.world));
 
         var matLocation = gl.getUniformLocation(this.program, "mat");
@@ -184,7 +184,7 @@ function initGraphics(game){
     var program = createProgram(gl, vertexShader, fragmentShader);
 
     var vao_p1 = gl.createVertexArray();
-    var count = setVao(gl, createCil(1,game.p1.radius,[1.0,0.0,0.0,1.0]), program, vao_p1);
+    var count = setVao(gl, test_obj(), program, vao_p1);
 
     var vao_p2 = gl.createVertexArray();
     var count2 = setVao(gl, createCil(1,game.p2.radius,[0.0,1.0,0.0,1.0]), program, vao_p2);
@@ -192,15 +192,14 @@ function initGraphics(game){
     var vao_p3 = gl.createVertexArray();
     var count3 = setVao(gl, createCil(0.5, game.disk.radius, [0.0,0.0,0.0,1.0]), program, vao_p3);
 
-    var world = utils.identityMatrix();
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,30,20],[0,0,0],[0,1,0]);
     var view2 = utils.MakeLookAt([0,30,-20],[0,0,0],[0,1,0]);
 
     clear(gl);
-    var d1 = new Drawable(gl, vao_p1, program, proj, world, count, game.p1);
-    var d2 = new Drawable(gl, vao_p2, program, proj, world, count2, game.p2);
-    var d3 = new Drawable(gl, vao_p3, program, proj, world, count3, game.disk);
+    var d1 = new Drawable(gl, vao_p1, program, proj, utils.MakeRotateYMatrix(90), count, game.p1);
+    var d2 = new Drawable(gl, vao_p2, program, proj, utils.identityMatrix(), count2, game.p2);
+    var d3 = new Drawable(gl, vao_p3, program, proj, utils.identityMatrix(), count3, game.disk);
     var todraw = [d1,d2,d3];
     drawScene(gl, todraw, 0, view1);
     drawScene(gl, todraw, gl.canvas.width/2, view2);

@@ -235,3 +235,13 @@ function createCil(h, r, color){
 
     return [finalv, ind2, finalc, finaln];
 }
+
+function test_obj(){
+    var mesh = new OBJ.Mesh(xwingObjStr);
+    var colors = [];
+    for(var i = 0; i < mesh.vertices.length/3; i++){
+	colors.push(1.0,0.0,0.0,1.0);
+    } 
+    console.log(mesh.vertices.length);
+    return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
+}
