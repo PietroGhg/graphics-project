@@ -1,4 +1,5 @@
-var maxV = 1.5; //cap to maximum velocity of the disk
+var maxV = 15; //cap to maximum velocity of the disk
+
 class Disk{
 
     constructor(radius){
@@ -14,6 +15,7 @@ class Disk{
         this.y = this.y + this.dy;
 	this.dx = this.dx - 0.01*this.dx;
 	this.dy = this.dy - 0.01*this.dy;
+
     }
 
     bump(){
@@ -32,8 +34,9 @@ class Border{
 
     check(disk){
         if(this.limit >= 0){
-            if(this.direction == "v" && disk.x + disk.radius >= this.limit){
-                this.handleCollision(disk);
+            if(this.direction == "v" && disk.x + disk.dx + disk.radius >= this.limit){
+		this.handleCollision(disk);
+
             }
             else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
                 this.handleCollision(disk);
@@ -69,7 +72,7 @@ class Paddle{
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
-	this.speed = 0.4;
+	this.speed = 4;
     }
 
     step(){
@@ -100,7 +103,7 @@ class Paddle{
         m = rotation2(-a);
         v = multiply2mv(m,v1);
 	
-	disk.bump();
+	//disk.bump();
         //update the disk
 	if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
             disk.dx = v[0] + this.dx;
@@ -128,23 +131,23 @@ class Table{
 class Game{
 
     constructor(){
-        this.p1 = new Paddle(1.5);
-        this.p1.y = 12;
+        this.p1 = new Paddle(15);
+        this.p1.y = 120;
         this.p1.dx = 0;
         this.p1.dy = 0;
 
-        this.p2 = new Paddle(1.5);
-        this.p2.y = -12;
+        this.p2 = new Paddle(15);
+        this.p2.y = -120;
         this.p2.dx = 0.0;
         this.p2.dy = 0.0;
 
-        this.disk = new Disk(1);
-        this.disk.dy = 0.0;
+        this.disk = new Disk(10);
 
-        this.right =  new Border(10, "v");
-        this.left = new Border(-10, "v");
-        this.top = new Border(15, "h");
-        this.bottom = new Border(-15, "h");
+
+        this.right =  new Border(100, "v");
+        this.left = new Border(-100, "v");
+        this.top = new Border(150, "h");
+        this.bottom = new Border(-150, "h");
 
         this.obstacles = [];
         this.obstacles.push(this.p1);
@@ -183,6 +186,7 @@ class Game{
     }
 
     checkAndStep(){
+	this.disk.step();
 	this.checkColl(this.p1);
 	this.checkColl(this.p2);
 	this.obstacles.forEach(
@@ -190,7 +194,6 @@ class Game{
 		b.check(this.disk);
             }, this);
 	
-	this.disk.step();
     }
 
 }
