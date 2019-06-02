@@ -216,18 +216,28 @@ class Game{
     checkColl(paddle){
         if(!(paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit ||
              checkDist(this.disk, paddle) ||
-             paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit )){
+             paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit)){
 
             paddle.x = paddle.x + paddle.dx;
         }
 
+        if(paddle.y <= 0){
+            if(!(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
+                 checkDist(this.disk, paddle) ||
+                 paddle.y + paddle.radius + paddle.dy >= 0)){
 
-        if(!(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
-             checkDist(this.disk, paddle) ||
-             paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){
-
-            paddle.y = paddle.y + paddle.dy;
+                paddle.y = paddle.y + paddle.dy;
+            }
         }
+        else if(paddle.y >= 0){
+            if(!(paddle.y - paddle.radius + paddle.dy <= 0 ||
+                 checkDist(this.disk, paddle) ||
+                 paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){
+
+                paddle.y = paddle.y + paddle.dy;
+            }
+        }
+
         paddle.normalizeSpeed();
     }
 
