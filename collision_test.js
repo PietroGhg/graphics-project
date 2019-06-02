@@ -13,33 +13,39 @@ class Disk{
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
-	this.dx = this.dx - 0.01*this.dx;
-	this.dy = this.dy - 0.01*this.dy;
-
+        this.dx = this.dx - 0.01*this.dx;
+        this.dy = this.dy - 0.01*this.dy;
     }
 
     bump(){
-	this.dx = this.dx - 0.01*(this.dx > 0 ? 1 : -1);
-	this.dy = this.dy - 0.01*(this.dy > 0 ? 1 : -1);
+        this.dx = this.dx - 0.01*(this.dx > 0 ? 1 : -1);
+        this.dy = this.dy - 0.01*(this.dy > 0 ? 1 : -1);
     }
 
 }
 
 class Border{
 
-    constructor(limit, direction){
+    constructor(limit, direction, goal){
         this.limit = limit;
         this.direction = direction;
+        this.goal = goal;
     }
 
-    check(disk){
+    check(disk, p1, p2){
         if(this.limit >= 0){
             if(this.direction == "v" && disk.x + disk.dx + disk.radius >= this.limit){
-		this.handleCollision(disk);
-
+                this.handleCollision(disk);
             }
             else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
-                this.handleCollision(disk);
+                //goal
+                if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
+                    setTimeout(function(){ disk.x = 0; disk.y = 0; p2.points++; console.log(p2.points); }, 3000);
+                }
+                //collision
+                else{
+                    this.handleCollision(disk);
+                }
             }
         }
         else{
@@ -47,7 +53,14 @@ class Border{
                 this.handleCollision(disk);
             }
             else if(this.direction == "h" && disk.y + disk.dy - disk.radius <= this.limit){
-                this.handleCollision(disk);
+                //goal
+                if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
+                    setTimeout(function(){ disk.x = 0; disk.y = 0; p1.points++; console.log(p1.points); }, 3000);
+                }
+                //collision
+                else{
+                    this.handleCollision(disk);
+                }
             }
         }
     }
@@ -59,7 +72,7 @@ class Border{
         else{
             disk.dx = -disk.dx;
         }
-	disk.bump();
+        disk.bump();
     }
 
 }
@@ -72,7 +85,8 @@ class Paddle{
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
-	this.speed = 4;
+        this.speed = 4;
+        this.points = 0;
     }
 
     step(){
@@ -102,30 +116,32 @@ class Paddle{
         //bring back to the xy coordinates
         m = rotation2(-a);
         v = multiply2mv(m,v1);
-	
-	//disk.bump();
+
+        //disk.bump();
         //update the disk
-	if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
+        if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
             disk.dx = v[0] + this.dx;
             disk.dy = v[1] + this.dy;
-	}
+        }
     }
 
     normalizeSpeed(){
-	var len = Math.sqrt(Math.pow(this.dx, 2) + Math.pow(this.dy, 2));
-	if(len != 0){
-	    this.dx = this.speed*(this.dx/len);
-	    this.dy = this.speed*(this.dy/len);
-	}
+        var len = Math.sqrt(Math.pow(this.dx, 2) + Math.pow(this.dy, 2));
+        if(len != 0){
+            this.dx = this.speed*(this.dx/len);
+            this.dy = this.speed*(this.dy/len);
+        }
     }
 
 }
 
 class Table{
+
     constructor(){
-	this.x = 0;
-	this.y = 0;
+        this.x = 0;
+        this.y = 0;
     }
+
 }
 
 class Game{
@@ -143,11 +159,10 @@ class Game{
 
         this.disk = new Disk(10);
 
-
-        this.right =  new Border(100, "v");
-        this.left = new Border(-100, "v");
-        this.top = new Border(150, "h");
-        this.bottom = new Border(-150, "h");
+        this.right = new Border(100, "v", 0);
+        this.left = new Border(-100, "v", 0);
+        this.top = new Border(150, "h", 20);
+        this.bottom = new Border(-150, "h", 20);
 
         this.obstacles = [];
         this.obstacles.push(this.p1);
@@ -163,37 +178,35 @@ class Game{
         this.borders.push(this.top);
         this.borders.push(this.bottom);
 
-	this.table = new Table();
+        this.table = new Table();
     }
 
     checkColl(paddle){
-	if( !(paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit ||
-	      checkDist(this.disk, paddle) ||
-	      paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit )){
-	    
+        if(!(paddle.x - paddle.radius + paddle.dx <= this.borders[1].limit ||
+             checkDist(this.disk, paddle) ||
+             paddle.x + paddle.radius + paddle.dx >= this.borders[0].limit )){
+
             paddle.x = paddle.x + paddle.dx;
-	}
+        }
 
-	
-	if( !(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
-	      checkDist(this.disk, paddle) ||
-	      paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){
 
-	    paddle.y = paddle.y + paddle.dy;
-	}
-	paddle.normalizeSpeed();
-	    
+        if(!(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
+             checkDist(this.disk, paddle) ||
+             paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){
+
+            paddle.y = paddle.y + paddle.dy;
+        }
+        paddle.normalizeSpeed();
     }
 
     checkAndStep(){
-	this.disk.step();
-	this.checkColl(this.p1);
-	this.checkColl(this.p2);
-	this.obstacles.forEach(
+        this.disk.step();
+        this.checkColl(this.p1);
+        this.checkColl(this.p2);
+        this.obstacles.forEach(
             function(b){
-		b.check(this.disk);
+                b.check(this.disk, this.p1, this.p2);
             }, this);
-	
     }
 
 }

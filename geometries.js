@@ -166,7 +166,7 @@ function createCil(h, r, color){
     var slices2 = 64;
 
     //bottom
-    for(i = 0; i < slices2; i++) {
+    for(i = 0; i < slices2; i++){
         vert2.push([r*Math.cos(2*Math.PI / slices2 * i), 0.0,r*Math.sin(2*Math.PI / slices2 * i)]);
         norm2.push([0.0,-1.0,0.0]);
         ind2.push(0);
@@ -178,7 +178,7 @@ function createCil(h, r, color){
     var off = vert2.length;
     vert2.push([0.0,h,0.0]);
     norm2.push([0.0,1.0,0.0]);
-    for(i = 0; i < slices2; i++) {
+    for(i = 0; i < slices2; i++){
         vert2.push([r*Math.cos(2*Math.PI / slices2 * i), h,-r*Math.sin(2*Math.PI / slices2 * i)]);
         norm2.push([0.0,1.0,0.0]);
         ind2.push(off);
@@ -240,21 +240,21 @@ function test_obj(){
     var mesh = new OBJ.Mesh(xwingObjStr);
     var colors = [];
     for(var i = 0; i < mesh.vertices.length/3; i++){
-	colors.push(1.0,0.0,0.0,1.0);
+        colors.push(1.0,0.0,0.0,1.0);
     } 
     return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
 }
 
 function test_json(){
     var model;
-    utils.get_json('table.json' , function(loaded){model = loaded;});
+    utils.get_json('table.json', function(loaded){model = loaded;});
 
     var vertices = model.meshes[0].vertices;
     var indices = [].concat.apply([], model.meshes[0].faces);
     var normals = model.meshes[0].normals;
     var colors = [];
     for(var i = 0; i < vertices.length/3; i++){
-	colors.push(1.0,0.0,0.0,1.0);
+        colors.push(1.0,0.0,0.0,1.0);
     }
     return [vertices, indices, colors, normals];
 }
