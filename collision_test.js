@@ -35,15 +35,15 @@ class Border{
             if(this.direction == "v" && disk.x + disk.radius >= this.limit){
                 this.handleCollision(disk);
             }
-            else if(this.direction == "h" && disk.y + disk.radius >= this.limit){
+            else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
                 this.handleCollision(disk);
             }
         }
         else{
-            if(this.direction == "v" && disk.x - disk.radius <= this.limit){
+            if(this.direction == "v" && disk.x + disk.dx - disk.radius <= this.limit){
                 this.handleCollision(disk);
             }
-            else if(this.direction == "h" && disk.y - disk.radius <= this.limit){
+            else if(this.direction == "h" && disk.y + disk.dy - disk.radius <= this.limit){
                 this.handleCollision(disk);
             }
         }
@@ -118,6 +118,13 @@ class Paddle{
 
 }
 
+class Table{
+    constructor(){
+	this.x = 0;
+	this.y = 0;
+    }
+}
+
 class Game{
 
     constructor(){
@@ -152,6 +159,8 @@ class Game{
         this.borders.push(this.left);
         this.borders.push(this.top);
         this.borders.push(this.bottom);
+
+	this.table = new Table();
     }
 
     checkColl(paddle){

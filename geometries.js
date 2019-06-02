@@ -61,7 +61,7 @@ function createCube(){
     const faceColors = [
         [0.0,  1.0,  1.0,  1.0],    // Front face: 
         [1.0,  0.0,  0.0,  1.0],    // Back face: red
-        [0.0,  1.0,  0.0,  1.0],    // Top face: green
+        [0.0,  1.0,  1.0,  1.0],    // Top face: cyan
         [0.0,  0.0,  1.0,  1.0],    // Bottom face: blue
         [1.0,  1.0,  0.0,  1.0],    // Right face: yellow
         [1.0,  0.0,  1.0,  1.0],    // Left face: purple
@@ -242,6 +242,19 @@ function test_obj(){
     for(var i = 0; i < mesh.vertices.length/3; i++){
 	colors.push(1.0,0.0,0.0,1.0);
     } 
-    console.log(mesh.vertices.length);
     return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
+}
+
+function test_json(){
+    var model;
+    utils.get_json('table.json' , function(loaded){model = loaded;});
+
+    var vertices = model.meshes[0].vertices;
+    var indices = [].concat.apply([], model.meshes[0].faces);
+    var normals = model.meshes[0].normals;
+    var colors = [];
+    for(var i = 0; i < vertices.length/3; i++){
+	colors.push(1.0,0.0,0.0,1.0);
+    }
+    return [vertices, indices, colors, normals];
 }

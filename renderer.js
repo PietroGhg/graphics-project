@@ -38,7 +38,7 @@ out vec4 outColor;
 in vec4 varColor;
 
 in vec3 normal;
-vec3 Ldir = normalize(vec3(0.1,0.3,1.0)); // coordinates of the light
+vec3 Ldir = normalize(vec3(0.1,0.7,1.0)); // coordinates of the light
 vec4 Lcol = vec4(1.0,1.0,1.0,1.0);
 void main() {
 vec4 temp = varColor*Lcol*clamp(dot(Ldir,normal),0.0,1.0); // calculates the amount of light of the pixel
@@ -192,6 +192,13 @@ function initGraphics(game){
     var vao_p3 = gl.createVertexArray();
     var count3 = setVao(gl, createCil(0.5, game.disk.radius, [0.0,0.0,0.0,1.0]), program, vao_p3);
 
+    var vao_t = gl.createVertexArray();
+    var count_t = setVao(gl, createCube(), program, vao_t);
+    var scaleY = 15;
+    var scaleX = 10;
+    //var world_t = utils.MakeScaleNuMatrix(scaleX, scaleY, 1);
+    var world_t = utils.multiplyMatrices(utils.MakeTranslateMatrix(0,-2,0), utils.MakeScaleNuMatrix(scaleX,1,scaleY));
+
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,30,20],[0,0,0],[0,1,0]);
     var view2 = utils.MakeLookAt([0,30,-20],[0,0,0],[0,1,0]);
@@ -200,7 +207,8 @@ function initGraphics(game){
     var d1 = new Drawable(gl, vao_p1, program, proj, utils.MakeRotateYMatrix(90), count, game.p1);
     var d2 = new Drawable(gl, vao_p2, program, proj, utils.identityMatrix(), count2, game.p2);
     var d3 = new Drawable(gl, vao_p3, program, proj, utils.identityMatrix(), count3, game.disk);
-    var todraw = [d1,d2,d3];
+    var d4 = new Drawable(gl, vao_t, program, proj, world_t, count_t, game.table);
+    var todraw = [d1,d2,d3,d4];
     drawScene(gl, todraw, 0, view1);
     drawScene(gl, todraw, gl.canvas.width/2, view2);
     var views = [view1, view2];
