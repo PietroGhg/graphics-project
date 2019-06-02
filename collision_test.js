@@ -30,8 +30,11 @@ class Border{
         this.limit = limit;
         this.direction = direction;
         this.goal = goal;
-    }
 
+	this.goal1 = false;
+	this.goal2 = false;
+    }
+    
     check(disk, p1, p2){
         if(this.limit >= 0){
             if(this.direction == "v" && disk.x + disk.dx + disk.radius >= this.limit){
@@ -40,7 +43,21 @@ class Border{
             else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
                 //goal
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
-                    setTimeout(function(){ disk.x = 0; disk.y = 0; p2.points++; console.log(p2.points); }, 3000);
+		    if(this.goal2 == false){
+			this.goal2 = true;
+			setTimeout(() => { disk.x = 0;
+					   disk.y = 0;
+					   disk.dx = 0;
+					   disk.dy = 0;
+					   p1.x = 0;
+					   p1.y = 120;
+					   p2.x = 0;
+					   p2.y = -120;
+					   p2.points++;
+					   console.log(p2.points);
+					   this.goal2 = false;
+					   }, 3000);
+		    }
                 }
                 //collision
                 else{
@@ -55,7 +72,20 @@ class Border{
             else if(this.direction == "h" && disk.y + disk.dy - disk.radius <= this.limit){
                 //goal
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
-                    setTimeout(function(){ disk.x = 0; disk.y = 0; p1.points++; console.log(p1.points); }, 3000);
+		    if(this.goal1 == false){
+			this.goal1 = true;
+			setTimeout(() => { disk.x = 0;
+					   disk.y = 0;
+					   disk.dx = 0;
+					   disk.dy = 0;
+					   p1.x = 0;
+					   p1.y = 120;
+					   p2.x = 0;
+					   p2.y = -120;
+					   p1.points++;
+					   console.log(p1.points);
+					   this.goal1 = false;}, 3000);
+		    }
                 }
                 //collision
                 else{
