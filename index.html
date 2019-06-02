@@ -5,19 +5,30 @@
     </head>
 
     <body style = "background: green" onload="countdown();">
-        <div style = "position:fixed; left: 550">
-            Time Left :
-            <input id="minutes" type="text" style="width: 10px;
-                                                   border: none; font-size: 16px;
-                                                   font-weight: bold; color: black;"><font size="5"> :
-            </font>
-            <input id="seconds" type="text" style="width: 20px;
-                                                   border: none; font-size: 16px;
-                                                   font-weight: bold; color: black;">
+        <div id="canvas-wrap" style="position: relative">
+
+            <div style = "position: fixed; left: 550">
+                Time Left :
+                <input id="minutes" type="text" style="width: 10px; border: none; font-size: 16px; font-weight: bold; color: black;">
+                <font size="5"> : </font>
+                <input id="seconds" type="text" style="width: 20px; border: none; font-size: 16px; font-weight: bold; color: black;">
+            </div>
+
+            <canvas id="c" style="background: white;" width="1200" height="600"></canvas>
+
+            <div id="wrapper" style="width: 640px; border: 1px white; overflow: hidden; position: absolute; top: 50px; left: 280px;">
+
+                <div id="first" style="width: 325px; float: left; border: 1px white;">
+                    P1 : <text id="p1" style="font-weight: bold; color: red;">0</text>
+                </div>
+
+                <div id="second" style="border: 1px white; float: right;">
+                    P2 : <text id="p2" style="font-weight: bold; color: green;">0</text>
+                </div>
+
+            </div>
+
         </div>
-        <canvas id = "c" style = "background: white;"
-                width = "1200"
-                height = "600"></canvas>
         <script src = "utils.js"></script>
         <script src = "webgl-obj-loader.min.js"></script>
         <script src = "table.js"></script>
