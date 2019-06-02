@@ -20,7 +20,7 @@ void main() {
 
 varColor = inColor;
 
-normal = mat3(mat_n)*a_normal; // to turn normal arrays in the right position
+normal = normalize(mat3(mat_n)*a_normal); // to turn normal arrays in the right position
 
 gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on the screen in the canvas
 
@@ -199,7 +199,7 @@ function initGraphics(game){
     var scaleX = 100;
     var scaleZ = 10;
     //var world_t = utils.MakeScaleNuMatrix(scaleX, scaleY, 1);
-    var world_t = utils.multiplyMatrices(utils.MakeTranslateMatrix(0,-20,0), utils.MakeScaleNuMatrix(scaleX,1,scaleY));
+    var world_t = utils.multiplyMatrices(utils.MakeTranslateMatrix(0,-20,0), utils.MakeScaleNuMatrix(scaleX,10,scaleY));
 
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,300,200],[0,0,0],[0,1,0]);
