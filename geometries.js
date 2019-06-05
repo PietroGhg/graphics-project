@@ -245,16 +245,31 @@ function test_obj(){
     return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
 }
 
-function test_json(){
-    var model;
-    utils.get_json('table.json', function(loaded){model = loaded;});
+function table(){
+    var mesh = new OBJ.Mesh(xwingObjStr);
+    var colors = [];
+    for(var i = 0; i < mesh.vertices.length/3; i++){
+        colors.push(1.0,0.0,0.0,1.0);
+    } 
+    return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
+}
 
-    var vertices = model.meshes[0].vertices;
-    var indices = [].concat.apply([], model.meshes[0].faces);
-    var normals = model.meshes[0].normals;
+
+
+function paddle(color){
+    /*var model;
+    utils.get_json('AirHockeyTable.json', function(loaded){model = loaded;});*/
+
+    console.log(models.meshes.length);
+    
+    var vertices = models.meshes[0].vertices;
+    var indices = [].concat.apply([], models.meshes[0].faces);
+    var normals = models.meshes[0].normals;
     var colors = [];
     for(var i = 0; i < vertices.length/3; i++){
-        colors.push(1.0,0.0,0.0,1.0);
+        colors.push(color[0],color[1],color[2],color[3]);
     }
     return [vertices, indices, colors, normals];
 }
+
+

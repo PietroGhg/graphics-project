@@ -184,14 +184,16 @@ function initGraphics(game){
     var program = createProgram(gl, vertexShader, fragmentShader);
 
     var vao_p1 = gl.createVertexArray();
-    var count = setVao(gl, createCil(10,game.p2.radius,[1.0,0.0,0.0,1.0]), program, vao_p1);
+    var count = setVao(gl, paddle([1.0,0.0,0.0,1.0]), program, vao_p1);
     var world_xwing = utils.multiplyMatrices(utils.MakeRotateYMatrix(90),utils.MakeScaleMatrix(10));
+    var world_p1 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,10), utils.MakeScaleMatrix(220));
 
     var vao_p2 = gl.createVertexArray();
-    var count2 = setVao(gl, createCil(10,game.p2.radius,[0.0,1.0,0.0,1.0]), program, vao_p2);
+    var count2 = setVao(gl, paddle([0.0,1.0,0.0,1.0]), program, vao_p2);
+    var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,5), utils.MakeScaleMatrix(220));
 
     var vao_p3 = gl.createVertexArray();
-    var count3 = setVao(gl, createCil(5, game.disk.radius, [0.0,0.0,0.0,1.0]), program, vao_p3);
+    var count3 = setVao(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, vao_p3);
 
     var vao_t = gl.createVertexArray();
     var count_t = setVao(gl, createCube(), program, vao_t);
@@ -206,8 +208,8 @@ function initGraphics(game){
     var view2 = utils.MakeLookAt([0,300,-200],[0,0,0],[0,1,0]);
 
     clear(gl);
-    var d1 = new Drawable(gl, vao_p1, program, proj, utils.identityMatrix(), count, game.p1);
-    var d2 = new Drawable(gl, vao_p2, program, proj, utils.identityMatrix(), count2, game.p2);
+    var d1 = new Drawable(gl, vao_p1, program, proj, world_p1, count, game.p1);
+    var d2 = new Drawable(gl, vao_p2, program, proj, world_p2, count2, game.p2);
     var d3 = new Drawable(gl, vao_p3, program, proj, utils.identityMatrix(), count3, game.disk);
     var d4 = new Drawable(gl, vao_t, program, proj, world_t, count_t, game.table);
     var todraw = [d1,d2,d3,d4];
