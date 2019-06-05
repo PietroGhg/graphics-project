@@ -196,12 +196,13 @@ function initGraphics(game){
     var count3 = setVao(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, vao_p3);
 
     var vao_t = gl.createVertexArray();
-    var count_t = setVao(gl, createCube(), program, vao_t);
+    var count_t = setVao(gl, table(), program, vao_t);
     var scaleY = 150;
     var scaleX = 100;
     var scaleZ = 10;
     //var world_t = utils.MakeScaleNuMatrix(scaleX, scaleY, 1);
-    var world_t = utils.multiplyMatrices(utils.MakeTranslateMatrix(0,-20,0), utils.MakeScaleNuMatrix(scaleX,10,scaleY));
+    //var world_t = utils.multiplyMatrices(utils.MakeTranslateMatrix(0,-20,0), utils.MakeScaleNuMatrix(scaleX,10,scaleY));
+    var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(180, 200, 240));
 
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,300,200],[0,0,0],[0,1,0]);

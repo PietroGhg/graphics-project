@@ -186,15 +186,15 @@ class Game{
 
         this.p2 = new Paddle(15);
         this.p2.y = -120;
-        this.p2.dx = 0.0;
+        this.p2.dx = 0;
         this.p2.dy = 0.0;
 
         this.disk = new Disk(10);
 
         this.right = new Border(100, "v", 0);
         this.left = new Border(-100, "v", 0);
-        this.top = new Border(150, "h", 20);
-        this.bottom = new Border(-150, "h", 20);
+        this.top = new Border(150, "h", 40);
+        this.bottom = new Border(-150, "h", 40);
 
         this.obstacles = [];
         this.obstacles.push(this.p1);
