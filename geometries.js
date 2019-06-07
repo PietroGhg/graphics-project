@@ -78,84 +78,6 @@ function createCube(){
     return [vertexes, indexes, colors, normals];
 }
 
-function prova(){
-    // Draws a cube
-    var i = 0;
-    var pos1 = [[-1.0,-1.0,2.0], [1.0,-1.0,2.0], [1.0,1.0,2.0], [-1.0,1.0,2.0],
-                [-1.0,-1.0,0.0], [1.0,-1.0,0.0], [1.0,1.0,0.0], [-1.0,1.0,0.0]];
-    var vert1 = [];
-    var norm1 = [];
-    var ind1 = [];
-    //front face
-    vert1.push(pos1[0]);
-    vert1.push(pos1[1]);
-    vert1.push(pos1[2]);
-    vert1.push(pos1[3]);
-    for(i = 0; i < 4; i++){
-        norm1.push([0.0,0.0,1.0]);
-    }
-    //right face
-    vert1.push(pos1[1]);
-    vert1.push(pos1[5]);
-    vert1.push(pos1[6]);
-    vert1.push(pos1[2]);
-    for(i = 0; i < 4; i++){
-        norm1.push([1.0,0.0,0.0]);
-    }
-    //back face
-    vert1.push(pos1[5]);
-    vert1.push(pos1[4]);
-    vert1.push(pos1[7]);
-    vert1.push(pos1[6]);
-    for(i = 0; i < 4; i++){
-        norm1.push([0.0,0.0,-1.0]);
-    }
-    //left face
-    vert1.push(pos1[4]);
-    vert1.push(pos1[0]);
-    vert1.push(pos1[3]);
-    vert1.push(pos1[7]);
-    for(i = 0; i < 4; i++){
-        norm1.push([-1.0,0.0,0.0]);
-    }
-    //bottom face
-    vert1.push(pos1[4]);
-    vert1.push(pos1[5]);
-    vert1.push(pos1[1]);
-    vert1.push(pos1[0]);
-    for(i = 0; i < 4; i++){
-        norm1.push([0.0,-1.0,0.0]);
-    }
-    //top face
-    vert1.push(pos1[3]);
-    vert1.push(pos1[2]);
-    vert1.push(pos1[6]);
-    vert1.push(pos1[7]);
-    for(i = 0; i < 4; i++){
-        norm1.push([0.0,1.0,0.0]);
-    }
-    //indexes
-    for(i = 0; i < 6; i++){
-        ind1.push(4*i);
-        ind1.push(4*i + 1);
-        ind1.push(4*i + 2);
-
-        ind1.push(4*i);
-        ind1.push(4*i + 2);
-        ind1.push(4*i + 3);
-    }
-
-    var finalv = [];
-    var finaln = [];
-    var finalc = [];
-
-    for(i = 0; i< vert1.length; i++){
-        finalv = finalv.concat(vert1[i]);
-        finaln = finaln.concat(norm1[i]);
-        finalc.push(1.0,0.0,0.0,1.0);
-    }
-    return [finalv, ind1, finalc, finaln];
-}
 
 function createCil(h, r, color){
     var i = 0;
@@ -226,57 +148,44 @@ function createCil(h, r, color){
     var finalv = [];
     var finaln = [];
     var finalc = [];
+    var finalt = [];
 
     for(i = 0; i< vert2.length; i++){
         finalv = finalv.concat(vert2[i]);
         finaln = finaln.concat(norm2[i]);
         finalc = finalc.concat(color);
+	finalt.push(0.5,0.5);
     }
 
-    return [finalv, ind2, finalc, finaln];
+    return [finalv, ind2, finalc, finaln,finalt];
 }
 
-function test_obj(){
-    var mesh = new OBJ.Mesh(xwingObjStr);
-    var colors = [];
-    for(var i = 0; i < mesh.vertices.length/3; i++){
-        colors.push(1.0,0.0,0.0,1.0);
-    } 
-    return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
-}
-
-/*function table(){
-    var mesh = new OBJ.Mesh(xwingObjStr);
-    var colors = [];
-    for(var i = 0; i < mesh.vertices.length/3; i++){
-        colors.push(1.0,0.0,0.0,1.0);
-    } 
-    return [mesh.vertices, mesh.indices, colors, mesh.vertexNormals];
-}*/
 
 
 
-function paddle(color){
+function paddle(){
     
     var vertices = models.meshes[0].vertices;
     var indices = [].concat.apply([], models.meshes[0].faces);
     var normals = models.meshes[0].normals;
+    var texCoord = [];
     var colors = [];
     for(var i = 0; i < vertices.length/3; i++){
-        colors.push(color[0],color[1],color[2],color[3]);
+	texCoord.push(0.5,0.5);
     }
-    return [vertices, indices, colors, normals];
+    return [vertices, indices, colors, normals, texCoord];
 }
 
 function table(){       
     var vertices = models.meshes[3].vertices;
     var indices = [].concat.apply([], models.meshes[3].faces);
     var normals = models.meshes[3].normals;
+    var texCoord = models.meshes[3].texturecoords[0];
     var colors = [];
     for(var i = 0; i < vertices.length/3; i++){
         colors.push(0.0,1.0,1.0,1.0);
     }
-    return [vertices, indices, colors, normals];
+    return [vertices, indices, colors, normals, texCoord];
 
 }
 
