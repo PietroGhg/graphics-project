@@ -222,9 +222,9 @@ class Game{
         }
 
         if(paddle.y <= 0){
-	    if(paddle.y + paddle.radius + paddle.dy >= 0){ //to avoid having speed != 0 when the paddle is still at half field
-		paddle.dy = 0;
-	    }
+            if(paddle.y + paddle.radius + paddle.dy >= 0){ //to avoid having speed != 0 when the paddle is still at half field
+                paddle.dy = 0;
+            }
             if(!(paddle.y - paddle.radius + paddle.dy <= this.borders[3].limit ||
                  checkDist(this.disk, paddle) ||
                  paddle.y + paddle.radius + paddle.dy >= 0)){
@@ -233,9 +233,9 @@ class Game{
             }
         }
         else if(paddle.y >= 0){
-	    if(paddle.y - paddle.radius + paddle.dy <= 0){ //to avoid having speed != 0 when the paddle is still at half field
-		paddle.dy = 0;
-	    }
+            if(paddle.y - paddle.radius + paddle.dy <= 0){ //to avoid having speed != 0 when the paddle is still at half field
+                paddle.dy = 0;
+            }
             if(!(paddle.y - paddle.radius + paddle.dy <= 0 ||
                  checkDist(this.disk, paddle) ||
                  paddle.y + paddle.radius + paddle.dy >= this.borders[2].limit)){

@@ -154,24 +154,20 @@ function createCil(h, r, color){
         finalv = finalv.concat(vert2[i]);
         finaln = finaln.concat(norm2[i]);
         finalc = finalc.concat(color);
-	finalt.push(0.5,0.5);
+        finalt.push(0.5,0.5);
     }
 
     return [finalv, ind2, finalc, finaln,finalt];
 }
 
-
-
-
 function paddle(){
-    
     var vertices = models.meshes[0].vertices;
     var indices = [].concat.apply([], models.meshes[0].faces);
     var normals = models.meshes[0].normals;
     var texCoord = [];
     var colors = [];
     for(var i = 0; i < vertices.length/3; i++){
-	texCoord.push(0.5,0.5);
+        texCoord.push(0.5,0.5);
     }
     return [vertices, indices, colors, normals, texCoord];
 }
@@ -186,8 +182,4 @@ function table(){
         colors.push(0.0,1.0,1.0,1.0);
     }
     return [vertices, indices, colors, normals, texCoord];
-
 }
-
-
-

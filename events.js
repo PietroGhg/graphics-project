@@ -1,7 +1,7 @@
 class Key{
     constructor(code){
-	this.code = code;
-	this.pressed = false;
+        this.code = code;
+        this.pressed = false;
     }
 }
 
@@ -14,7 +14,6 @@ keys.push(new Key(74));
 keys.push(new Key(76));
 keys.push(new Key(73));
 keys.push(new Key(75));
-
 
 window.addEventListener("keydown", checkPress, false);
 window.addEventListener("keyup", checkPress, false);
@@ -76,17 +75,16 @@ function release(e){
     }
 }
 
-
 function checkPress(e){
     keys.forEach(
-	function(k){
-	    if(k.code == e.keyCode && e.type == "keydown" && k.pressed == false){
-		action(e);
-		k.pressed = true;
-	    }
-	    else if(k.code == e.keyCode && e.type == "keyup"){
-		release(e);
-		k.pressed = false;
-	    }
-	});
+        function(k){
+            if(k.code == e.keyCode && e.type == "keydown" && k.pressed == false){
+                action(e);
+                k.pressed = true;
+            }
+            else if(k.code == e.keyCode && e.type == "keyup"){
+                release(e);
+                k.pressed = false;
+            }
+        });
 }
