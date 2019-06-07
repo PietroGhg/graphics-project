@@ -9,10 +9,13 @@ in vec3 a_position;
 in vec3 a_normal;
 out vec3 normal;
 
+out vec4 cameraCoord;
+
 in vec2 a_texCoord;
 out vec2 v_texCoord;
 
 uniform mat4 mat; // world-view-projection-matrix
+uniform mat4 matWV; // world-view-matrix
 uniform mat4 mat_n; // normal arrays
 
 // all shaders have a main function
@@ -21,12 +24,13 @@ void main() {
 // gl_Position is a special variable a vertex shader
 // is responsible for setting
 
-
 v_texCoord = a_texCoord;
 
 normal = normalize(mat3(mat_n)*a_normal); // to turn normal arrays in the right position
 
 gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on the screen in the canvas
+
+cameraCoord = matWV * vec4(a_position.xyz, 1); // camera coordinates
 
 }
 `;
@@ -40,15 +44,24 @@ precision mediump float;
 // we need to declare an output for the fragment shader
 out vec4 outColor;
 in vec2 v_texCoord;
+in vec4 cameraCoord;
 
 uniform sampler2D u_image;
 
 in vec3 normal;
 vec3 Ldir = normalize(vec3(0.1,0.7,1.0)); // coordinates of the light
+
 vec4 Lcol = vec4(1.0,1.0,1.0,1.0);
 void main() {
-vec4 temp = texture(u_image, v_texCoord)*Lcol*clamp(dot(Ldir,normal),0.0,1.0); // calculates the amount of light of the pixel
-outColor = vec4(temp.xyz, 1.0);
+
+vec4 f_diffuse = texture(u_image, v_texCoord)*Lcol*clamp(dot(Ldir,normal),0.0,1.0); // calculates the f_diffuse
+
+float cross_prod = dot(Ldir, normal);
+vec3 n_prime = normal*cross_prod;
+vec3 r = 2.0*n_prime - Ldir;
+vec4 f_specular = texture(u_image, v_texCoord)*Lcol*clamp(dot(Ldir,r),0.0,1.0); // calculates the f_specular
+
+outColor = vec4(f_diffuse.xyz + f_specular.xyz, 1.0);
 
 }
 `;
@@ -115,14 +128,14 @@ function setVaoFromImage(gl, vectors, program, image, tex_id, vao){ // vao is th
     gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0,0);
 
     var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
-    
+
     var texCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
 
     gl.enableVertexAttribArray(texCoordAttributeLocation);
     gl.vertexAttribPointer(
-	texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+        texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
     var texture = gl.createTexture();
 
@@ -131,7 +144,7 @@ function setVaoFromImage(gl, vectors, program, image, tex_id, vao){ // vao is th
     gl.activeTexture(gl.TEXTURE0 + tex_id);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    
+
     // Fill the texture with a 1x1 blue pixel until the image is loaded
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                   new Uint8Array([0, 0, 255, 255]));
@@ -139,7 +152,7 @@ function setVaoFromImage(gl, vectors, program, image, tex_id, vao){ // vao is th
     //when the image is loaded, put its data inside the texture
     image.addEventListener('load', function() { setStuff(gl, vao, texture, image,tex_id); });
 
-    
+
     // Set the parameters so we don't need mips and so we're not filtering
     // and we don't repeat
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -184,14 +197,14 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
     gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0,0);
 
     var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
-    
+
     var texCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
 
     gl.enableVertexAttribArray(texCoordAttributeLocation);
     gl.vertexAttribPointer(
-	texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+        texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
     var texture = gl.createTexture();
 
@@ -200,11 +213,11 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
     gl.activeTexture(gl.TEXTURE0 + tex_id);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    
+
     // Fill the texture with the given color
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(color));
 
-       
+
     // Set the parameters so we don't need mips and so we're not filtering
     // and we don't repeat
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -235,7 +248,7 @@ class Drawable{
         this.world = world;
         this.count = count;
         this.obj = obj;
-	this.tex_id = tex_id;
+        this.tex_id = tex_id;
     }
 
     draw(view){
@@ -245,14 +258,21 @@ class Drawable{
         gl.bindVertexArray(this.vao);
 
         var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, temp_world));
+        var matWV = utils.multiplyMatrices(view, temp_world);
         var mat_n = utils.transposeMatrix( utils.invertMatrix(temp_world));
 
+        // associates world-view-projection matrix with shader
         var matLocation = gl.getUniformLocation(this.program, "mat");
         gl.uniformMatrix4fv(matLocation, true, mat);
 
-	var imageLocation = gl.getUniformLocation(this.program, "u_image");
-	gl.uniform1i(imageLocation, this.tex_id);
+        // associates world-view matrix with shader
+        var matVMlocation = gl.getUniformLocation(this.program, "matWV");
+        gl.uniformMatrix4fv(matVMlocation, true, matWV);
 
+        var imageLocation = gl.getUniformLocation(this.program, "u_image");
+        gl.uniform1i(imageLocation, this.tex_id);
+
+        // associates normal arrays with shader
         var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
         gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
 
@@ -299,6 +319,7 @@ function initGraphics(game){
 
     var vao_t = gl.createVertexArray();
     var img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = "table.png";
     var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t);
     var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(180, 200, 240));
@@ -355,6 +376,3 @@ var views; //view matricies for the two players
 
 [gl, todraw, views] = initGraphics(game); //initializes the buffers ecc
 animate(gl, todraw, views); //animates the game and draws the scenes
-
-
-
