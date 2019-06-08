@@ -46,7 +46,7 @@ class Border{
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
-                        disk.vis = false;
+                        setTimeout(() => {disk.vis = false;}, 500);
                         setTimeout(() => { disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
@@ -78,7 +78,7 @@ class Border{
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-                        disk.vis = false;
+                        setTimeout(() => {disk.vis = false;}, 500);
                         setTimeout(() => { disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
@@ -91,7 +91,7 @@ class Border{
                                           p1.points++;
                                           document.getElementById("p1").innerHTML = p1.points;
                                           console.log(p1.points);
-                                          this.goal1 = false;}, 3000);
+                                          this.goal1 = false;}, 1500);
                     }
                 }
                 //collision
