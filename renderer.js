@@ -9,8 +9,7 @@ in vec3 a_position;
 in vec3 a_normal;
 out vec3 normal;
 
-out vec4 cameraCoord;
-out vec4 cameraLdir;
+out vec3 cameraCoord;
 out vec3 cameraNormal;
 
 in vec2 a_texCoord;
@@ -21,7 +20,6 @@ uniform mat4 matWV; // world-view matrix
 uniform mat4 mat_n; // normal arrays
 uniform mat4 mat_nWV; // world-view normal arrays
 
-vec3 Ldir = normalize(vec3(0.1,0.7,1.0)); // coordinates of the light
 
 // all shaders have a main function
 void main() {
@@ -35,9 +33,7 @@ normal = normalize(mat3(mat_n)*a_normal); // to turn normal arrays in the right 
 
 gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on the screen in the canvas
 
-cameraCoord = matWV * vec4(a_position.xyz, 1); // camera coordinates of object
-
-cameraLdir = matWV * vec4(Ldir.xyz, 1); // camera coordinates of light
+cameraCoord = (matWV * vec4(a_position.xyz, 1)).xyz; // camera coordinates of object
 
 cameraNormal = mat3(mat_nWV) * a_normal; // camera coordinates of normal arrays
 
@@ -54,25 +50,31 @@ precision mediump float;
 out vec4 outColor;
 in vec2 v_texCoord;
 
-in vec4 cameraCoord;
-in vec4 cameraLdir;
+in vec3 cameraCoord;
+
 in vec3 cameraNormal;
 
 uniform sampler2D u_image;
+uniform mat4 view;
 
 in vec3 normal;
 
-vec3 Ldir = normalize(vec3(0.1,0.7,1.0)); // coordinates of the light
+vec3 Ldir = normalize(vec3(0.0,1.0,1.0)); // coordinates of the light
 vec4 Lcol = vec4(1.0,1.0,1.0,1.0);
 
 void main() {
+vec3 cm = normalize(cameraNormal);
+Ldir = mat3(view)*Ldir;
+vec4 color = texture(u_image, v_texCoord);
+vec4 f_diffuse = color*Lcol*clamp(dot(Ldir,cm),0.0,1.0); // calculates the f_diffuse
 
-vec4 f_diffuse = texture(u_image, v_texCoord)*Lcol*clamp(dot(Ldir,normal),0.0,1.0); // calculates the f_diffuse
+float cross_prod = dot(Ldir, cm);
+vec3 n_prime = cm*cross_prod;
+vec3 r = 2.0*n_prime - Ldir;
+vec4 f_specular = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(normalize(0.0 - cameraCoord),r),0.0,1.0), 128.0); // calculates the f_specular
 
-float cross_prod = dot(cameraLdir.xyz, cameraNormal);
-vec3 n_prime = cameraNormal*cross_prod;
-vec3 r = 2.0*n_prime - cameraLdir.xyz;
-vec4 f_specular = texture(u_image, v_texCoord)*Lcol*pow(clamp(dot(cameraLdir.xyz,r),0.0,1.0), 100.0); // calculates the f_specular
+vec3 h = normalize(Ldir + normalize(0.0 - cameraCoord));
+vec4 f_s = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(cm,h),0.0,1.0), 128.0);
 
 outColor = vec4(f_diffuse.xyz + f_specular.xyz, 1.0);
 
@@ -282,6 +284,9 @@ class Drawable{
         // associates normal arrays with shader
         var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
         gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
+
+	var viewLocation = gl.getUniformLocation(this.program, "view");
+	gl.uniformMatrix4fv(viewLocation, true, view);
 
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
