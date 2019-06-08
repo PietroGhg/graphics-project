@@ -68,22 +68,22 @@ Ldir = mat3(view)*Ldir;
 vec4 color = texture(u_image, v_texCoord);
 vec4 f_diffuse = color*Lcol*clamp(dot(Ldir,cm),0.0,1.0); // calculates the f_diffuse
 
-//phong
+// phong
 float cross_prod = dot(Ldir, cm);
 vec3 n_prime = cm*cross_prod;
 vec3 r = 2.0*n_prime - Ldir;
 vec4 f_specular = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(normalize(0.0 - cameraCoord),r),0.0,1.0), 128.0); // calculates the f_specular
 
-//blynn
+// blynn
 vec3 h = normalize(Ldir + normalize(0.0 - cameraCoord));
 vec4 f_s = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(cm,h),0.0,1.0), 128.0);
 
-//point lights
+// point lights
 vec4 Lps = vec4(0.7,0.7,0.7,1.0); //speculat light color
 float g = 60.0; //target distance for decay
 
-vec3 Lpoint = (view*vec4(0.0,200.0,100.0,1.0)).xyz; //position of point light
-vec3 Lpoint_dir = normalize(Lpoint - cameraCoord); //computes light direction
+vec3 Lpoint = (view*vec4(0.0,200.0,100.0,1.0)).xyz; // position of point light
+vec3 Lpoint_dir = normalize(Lpoint - cameraCoord); // computes light direction
 float decay = pow(g / length(Lpoint - cameraCoord), 0.5);
 vec4 point_diff = color*clamp(dot(Lpoint_dir, cm),0.0,1.0);
 vec3 h_point = normalize(Lpoint_dir + normalize(0.0 - cameraCoord));
@@ -278,40 +278,41 @@ class Drawable{
     }
 
     draw(view){
-        var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
-        var gl = this.gl;
-        gl.useProgram(this.program);
-        gl.bindVertexArray(this.vao);
+        if(this.obj.vis){
+            var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
+            var gl = this.gl;
+            gl.useProgram(this.program);
+            gl.bindVertexArray(this.vao);
 
-        var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, temp_world));
-        var matWV = utils.multiplyMatrices(view, temp_world);
-        var mat_n = utils.transposeMatrix(utils.invertMatrix(temp_world));
-        var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV));
+            var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, temp_world));
+            var matWV = utils.multiplyMatrices(view, temp_world);
+            var mat_n = utils.transposeMatrix(utils.invertMatrix(temp_world));
+            var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV));
 
+            // associates world-view-projection matrix with shader
+            var matLocation = gl.getUniformLocation(this.program, "mat");
+            gl.uniformMatrix4fv(matLocation, true, mat);
 
-        // associates world-view-projection matrix with shader
-        var matLocation = gl.getUniformLocation(this.program, "mat");
-        gl.uniformMatrix4fv(matLocation, true, mat);
+            // associates world-view matrix with shader
+            var matWVlocation = gl.getUniformLocation(this.program, "matWV");
+            gl.uniformMatrix4fv(matWVlocation, true, matWV);
 
-        // associates world-view matrix with shader
-        var matWVlocation = gl.getUniformLocation(this.program, "matWV");
-        gl.uniformMatrix4fv(matWVlocation, true, matWV);
+            var imageLocation = gl.getUniformLocation(this.program, "u_image");
+            gl.uniform1i(imageLocation, this.tex_id);
 
-        var imageLocation = gl.getUniformLocation(this.program, "u_image");
-        gl.uniform1i(imageLocation, this.tex_id);
+            // associates normal arrays with shader
+            var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
+            gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
 
-        // associates normal arrays with shader
-        var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
-        gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
+            // associates normal arrays with shader
+            var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
+            gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
 
-        // associates normal arrays with shader
-        var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
-        gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
+            var viewLocation = gl.getUniformLocation(this.program, "view");
+            gl.uniformMatrix4fv(viewLocation, true, view);
 
-	var viewLocation = gl.getUniformLocation(this.program, "view");
-	gl.uniformMatrix4fv(viewLocation, true, view);
-
-        gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+        }
     }
 
 }
@@ -359,8 +360,8 @@ function initGraphics(game){
     var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(180, 200, 240));
 
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
-    var view1 = utils.MakeLookAt([0,300,200],[0,0,0],[0,1,0]);
-    var view2 = utils.MakeLookAt([0,300,-200],[0,0,0],[0,1,0]);
+    var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]);
+    var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]);
 
     clear(gl);
     var d1 = new Drawable(gl, vao_p1, program, proj, world_p1, count, game.p1,0);

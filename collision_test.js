@@ -8,6 +8,7 @@ class Disk{
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
+        this.vis = true;
     }
 
     step(){
@@ -45,10 +46,12 @@ class Border{
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
+                        disk.vis = false;
                         setTimeout(() => { disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
                                           disk.dy = 0;
+                                          disk.vis = true;
                                           p1.x = 0;
                                           p1.y = 120;
                                           p2.x = 0;
@@ -75,10 +78,12 @@ class Border{
                 if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
+                        disk.vis = false;
                         setTimeout(() => { disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
                                           disk.dy = 0;
+                                          disk.vis = true;
                                           p1.x = 0;
                                           p1.y = 120;
                                           p2.x = 0;
@@ -119,6 +124,7 @@ class Paddle{
         this.dy = 0;
         this.speed = 4;
         this.points = 0;
+        this.vis = true;
     }
 
     step(){
@@ -172,6 +178,7 @@ class Table{
     constructor(){
         this.x = 0;
         this.y = 0;
+        this.vis = true;
     }
 
 }

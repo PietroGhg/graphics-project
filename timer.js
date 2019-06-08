@@ -33,7 +33,7 @@ function Decrement() {
         }
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
-            alert('Game Over!');
+            if(!alert('Game Over!')){window.location.reload();}
             minutes.value = 0;
             seconds.value = 0;
         }
