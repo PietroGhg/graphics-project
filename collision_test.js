@@ -1,4 +1,4 @@
-var maxV = 15; //cap to maximum velocity of the disk
+var maxV = 10; //cap to maximum velocity of the disk
 
 class Disk{
 
@@ -43,7 +43,7 @@ class Border{
             }
             else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
                 //goal
-                if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
+                if (disk.x + disk.radius >= -this.goal && disk.x  + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
                         setTimeout(() => {disk.vis = false;}, 500);
@@ -75,7 +75,7 @@ class Border{
             }
             else if(this.direction == "h" && disk.y + disk.dy - disk.radius <= this.limit){
                 //goal
-                if (disk.x + disk.dx + disk.radius >= -this.goal && disk.x + disk.dx + disk.radius <= this.goal){
+                if (disk.x + disk.radius >= -this.goal && disk.x + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
                         setTimeout(() => {disk.vis = false;}, 500);
@@ -155,12 +155,22 @@ class Paddle{
         m = rotation2(-a);
         v = multiply2mv(m,v1);
 
-        //disk.bump();
+	//prevent sticking
+	//positions the disk on the radial vector that connects the centers, and a distance sligthly greater than the radiuses
+	var posD = [disk.x, disk.y];
+	var posP = [this.x, this.y];
+	var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 0.4)); 
+	console.log("pos " + disk.x + " " + disk.y);
+	console.log("speed " + disk.x + " " + disk.y);
+	disk.x = this.x + newD[0];
+	disk.y = this.y + newD[1];
         //update the disk
+	
         if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
             disk.dx = v[0] + this.dx;
             disk.dy = v[1] + this.dy;
         }
+	disk.bump();
     }
 
     normalizeSpeed(){
@@ -272,6 +282,15 @@ function rotation2(a){
 
 function multiply2mv(m,v){
     return [m[0]*v[0] + m[1]*v[1], m[2]*v[0] + m[3]*v[1]];
+}
+
+function multiply2vc(v,c){
+    return [c*v[0], c*v[1]];
+}
+
+function norm2(v){
+    var l = Math.sqrt(v[0]*v[0] + v[1]*v[1]);
+    return [v[0]/l, v[1]/l];
 }
 
 //returns true when paddle and disk collide
