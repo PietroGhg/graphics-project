@@ -14,8 +14,8 @@ class Disk{
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
-        this.dx = this.dx - 0.01*this.dx;
-        this.dy = this.dy - 0.01*this.dy;
+        this.dx = this.dx - 0.005*this.dx;
+        this.dy = this.dy - 0.005*this.dy;
     }
 
     bump(){
@@ -123,7 +123,7 @@ class Paddle{
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
-        this.speed = 4;
+        this.speed = 5;
         this.points = 0;
         this.vis = true;
     }
