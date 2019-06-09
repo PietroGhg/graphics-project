@@ -1,5 +1,5 @@
 //set minutes
-var mins = 3;
+var mins = 0.5;
 
 //calculate the seconds
 var secs = mins * 60;
@@ -33,7 +33,15 @@ function Decrement() {
         }
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
-            if(!alert('Game Over!')){window.location.reload();}
+            if (document.getElementById("p1").innerHTML > document.getElementById("p2").innerHTML){
+                if(!alert('Game Over!\n\nP1 wins! 🏅🏆')){window.location.reload();}
+            }
+            else if (document.getElementById("p1").innerHTML < document.getElementById("p2").innerHTML){
+                if(!alert('Game Over!\n\nP2 wins! 🏅🏆')){window.location.reload();}
+            }
+            else {
+                if(!alert('Game Over!\n\n🏅 Tie! 🏅')){window.location.reload();}
+            }
             minutes.value = 0;
             seconds.value = 0;
         }

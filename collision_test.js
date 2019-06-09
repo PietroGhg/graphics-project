@@ -46,8 +46,8 @@ class Border{
                 if (disk.x + disk.radius >= -this.goal && disk.x  + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
-                        setTimeout(() => {disk.vis = false;}, 500);
-                        setTimeout(() => { disk.x = 0;
+                        setTimeout(() => {disk.vis = false;}, 150);
+                        setTimeout(() => {disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
                                           disk.dy = 0;
@@ -60,7 +60,7 @@ class Border{
                                           document.getElementById("p2").innerHTML = p2.points;
                                           console.log(p2.points);
                                           this.goal2 = false;
-                                         }, 3000);
+                                         }, 1500);
                     }
                 }
                 //collision
@@ -78,8 +78,8 @@ class Border{
                 if (disk.x + disk.radius >= -this.goal && disk.x + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-                        setTimeout(() => {disk.vis = false;}, 500);
-                        setTimeout(() => { disk.x = 0;
+                        setTimeout(() => {disk.vis = false;}, 150);
+                        setTimeout(() => {disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
                                           disk.dy = 0;
@@ -91,7 +91,8 @@ class Border{
                                           p1.points++;
                                           document.getElementById("p1").innerHTML = p1.points;
                                           console.log(p1.points);
-                                          this.goal1 = false;}, 1500);
+                                          this.goal1 = false;
+                                         }, 1500);
                     }
                 }
                 //collision
@@ -155,22 +156,22 @@ class Paddle{
         m = rotation2(-a);
         v = multiply2mv(m,v1);
 
-	//prevent sticking
-	//positions the disk on the radial vector that connects the centers, and a distance sligthly greater than the radiuses
-	var posD = [disk.x, disk.y];
-	var posP = [this.x, this.y];
-	var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 0.4)); 
-	console.log("pos " + disk.x + " " + disk.y);
-	console.log("speed " + disk.x + " " + disk.y);
-	disk.x = this.x + newD[0];
-	disk.y = this.y + newD[1];
+        //prevent sticking
+        //positions the disk on the radial vector that connects the centers, and a distance sligthly greater than the radiuses
+        var posD = [disk.x, disk.y];
+        var posP = [this.x, this.y];
+        var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 0.4)); 
+        console.log("pos " + disk.x + " " + disk.y);
+        console.log("speed " + disk.x + " " + disk.y);
+        disk.x = this.x + newD[0];
+        disk.y = this.y + newD[1];
         //update the disk
-	
+
         if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
             disk.dx = v[0] + this.dx;
             disk.dy = v[1] + this.dy;
         }
-	disk.bump();
+        disk.bump();
     }
 
     normalizeSpeed(){
