@@ -213,8 +213,9 @@ class Game{
 
         this.disk = new Disk(6.5);
 
-        this.right = new Border(90, "v", 0);
-        this.left = new Border(-90, "v", 0);
+
+        this.right = new Border(95, "v", 0);
+        this.left = new Border(-95, "v", 0);
         this.top = new Border(186, "h", 44);
         this.bottom = new Border(-186, "h", 44);
 

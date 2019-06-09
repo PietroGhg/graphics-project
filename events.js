@@ -88,3 +88,7 @@ function checkPress(e){
             }
         });
 }
+
+function changeView(){
+    twoPview = !twoPview;
+}

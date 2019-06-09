@@ -255,25 +255,24 @@ function setStuff(gl, vao, texture, image, tex_id){
 
 class Drawable{
 
-    constructor(gl, vao, program, proj, world, count, obj, tex_id){
+    constructor(gl, vao, program, world, count, obj, tex_id){
         this.gl = gl;
         this.vao = vao;
         this.program = program;
-        this.proj = proj;
         this.world = world;
         this.count = count;
         this.obj = obj;
         this.tex_id = tex_id;
     }
 
-    draw(view){
+    draw(proj, view){
         if(this.obj.vis){
             var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
             var gl = this.gl;
             gl.useProgram(this.program);
             gl.bindVertexArray(this.vao);
 
-            var mat = utils.multiplyMatrices(this.proj, utils.multiplyMatrices(view, temp_world));
+            var mat = utils.multiplyMatrices(proj, utils.multiplyMatrices(view, temp_world));
             var matWV = utils.multiplyMatrices(view, temp_world);
             var mat_n = utils.transposeMatrix(utils.invertMatrix(temp_world));
             var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV));
@@ -336,7 +335,7 @@ function initGraphics(game){
 
     var vao_p2 = gl.createVertexArray();
     var count2 = setVaoFromColor(gl, paddle(), program, [0,255,0,255], 1, vao_p2);
-    var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,5), utils.MakeScaleMatrix(220));
+    var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,0), utils.MakeScaleMatrix(220));
 
     var vao_p3 = gl.createVertexArray();
     var count3 = setVaoFromColor(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, [0,0,0,255], 2, vao_p3);
@@ -348,47 +347,57 @@ function initGraphics(game){
     var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t);
     var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(220, 200, 220));
 
-    var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
+    var proj1 = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
+    var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]);
     var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]);
+    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[0,1,0]);
 
     clear(gl);
-    var d1 = new Drawable(gl, vao_p1, program, proj, world_p1, count, game.p1,0);
-    var d2 = new Drawable(gl, vao_p2, program, proj, world_p2, count2, game.p2,1);
-    var d3 = new Drawable(gl, vao_p3, program, proj, utils.identityMatrix(), count3, game.disk,2);
-    var d4 = new Drawable(gl, vao_t, program, proj, world_t, count_t, game.table,3);
+    var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1,0);
+    var d2 = new Drawable(gl, vao_p2, program, world_p2, count2, game.p2,1);
+    var d3 = new Drawable(gl, vao_p3, program, utils.identityMatrix(), count3, game.disk,2);
+    var d4 = new Drawable(gl, vao_t, program,  world_t, count_t, game.table,3);
     var todraw = [d1,d2,d3,d4];
-    drawScene(gl, todraw, 0, view1);
-    drawScene(gl, todraw, gl.canvas.width/2, view2);
-    var views = [view1, view2];
+    var views = [view1, view2, view3];
+    var projs = [proj1, proj2];
 
-    return [gl, todraw, views];
+    return [gl, todraw, projs, views];
 }
 
 //renders the scene for one player, setting the viewport
 //and drawing the objects with the given view matrix
-function drawScene(gl, todraw, x, view){
-    gl.viewport(x, 0, gl.canvas.width/2, gl.canvas.height);
+function drawScene(gl, todraw, x, width, proj, view){
+    gl.viewport(x, 0, width, gl.canvas.height);
 
     todraw.forEach(
         function(td){
-            td.draw(view);
+            td.draw(proj, view);
         });
 }
 
 //animates the scene by making every object of the game step
 //and calling drawScene() twice, once for each player
-function animate(gl, todraw, views){
+function animate(gl, todraw, projs, views){
     var view1 = views[0];
     var view2 = views[1];
+    var view3 = views[2];
+    var proj2p = projs[0];
+    var proj1p = projs[1];
 
     game.checkAndStep();
 
-    clear(gl);
-    drawScene(gl, todraw, 0, view1);
-    drawScene(gl, todraw, gl.canvas.width/2, view2);
+    if(twoPview){
+	clear(gl);
+	drawScene(gl, todraw, 0, gl.canvas.width/2, proj2p, view1);
+	drawScene(gl, todraw, gl.canvas.width/2, gl.canvas.width/2, proj2p, view2);
+    }
+    else{
+	clear(gl);
+	drawScene(gl, todraw, 0, gl.canvas.width, proj1p, view3);
+    }
 
-    window.requestAnimationFrame(function(){ animate(gl, todraw, views);});
+    window.requestAnimationFrame(function(){ animate(gl, todraw, projs, views);});
 }
 
 
@@ -397,6 +406,7 @@ var game = new Game();
 var gl; //webgl context
 var todraw; //array of objects to be drawn
 var views; //view matricies for the two players
-
-[gl, todraw, views] = initGraphics(game); //initializes the buffers ecc
-animate(gl, todraw, views); //animates the game and draws the scenes
+var projs;
+var twoPview = true;
+[gl, todraw, projs, views] = initGraphics(game); //initializes the buffers ecc
+animate(gl, todraw, projs, views); //animates the game and draws the scenes
