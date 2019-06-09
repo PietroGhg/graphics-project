@@ -34,10 +34,10 @@ function Decrement() {
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
             if (document.getElementById("p1").innerHTML > document.getElementById("p2").innerHTML){
-                if(!alert('Game Over!\n\nP1 wins! 🏅🏆')){window.location.reload();}
+                if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){window.location.reload();}
             }
             else if (document.getElementById("p1").innerHTML < document.getElementById("p2").innerHTML){
-                if(!alert('Game Over!\n\nP2 wins! 🏅🏆')){window.location.reload();}
+                if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){window.location.reload();}
             }
             else {
                 if(!alert('Game Over!\n\n🏅 Tie! 🏅')){window.location.reload();}
