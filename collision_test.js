@@ -46,7 +46,7 @@ class Border{
                 if (disk.x + disk.radius >= -this.goal && disk.x  + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
-                        setTimeout(() => {disk.vis = false;}, 150);
+                        setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
@@ -78,7 +78,7 @@ class Border{
                 if (disk.x + disk.radius >= -this.goal && disk.x + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-                        setTimeout(() => {disk.vis = false;}, 150);
+                        setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {disk.x = 0;
                                           disk.y = 0;
                                           disk.dx = 0;
