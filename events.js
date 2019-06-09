@@ -20,59 +20,74 @@ window.addEventListener("keyup", checkPress, false);
 
 function action(e){
     // Pressing 'A' on the keybord p1 moves left
-    if(e.keyCode == 65){
+    if(e.keyCode == 65 && twoPview)
         game.p1.dx = -game.p1.speed;
-    }
+    else if(e.keyCode == 65 && !twoPview)
+        game.p1.dy = game.p1.speed;
 
     // Pressing 'D' on the keybord p1 moves right
-    if(e.keyCode == 68){
+    if(e.keyCode == 68 && twoPview)
         game.p1.dx = game.p1.speed;
-    }
+    else if(e.keyCode == 68 && !twoPview)
+        game.p1.dy = -game.p1.speed;
 
     // Pressing 'W' on the keybord p1 moves up
-    if(e.keyCode == 87){
+    if(e.keyCode == 87 && twoPview)
         game.p1.dy = -game.p1.speed;
-    }
+    else if(e.keyCode == 87 && !twoPview)
+        game.p1.dx = -game.p1.speed;
 
     // Pressing 'S' on the keybord p1 moves down
-    if(e.keyCode == 83){
+    if(e.keyCode == 83 && twoPview)
         game.p1.dy = game.p1.speed;
-    }
+    else if(e.keyCode == 83 && !twoPview)
+        game.p1.dx = game.p1.speed;
 
     // Pressing 'J' on the keybord p2 moves left
-    if(e.keyCode == 74){
+    if(e.keyCode == 74 && twoPview)
         game.p2.dx = game.p2.speed;
-    }
+    else if(e.keyCode == 74 && !twoPview)
+        game.p2.dy = game.p2.speed;
 
     // Pressing 'L' on the keybord p2 moves right
-    if(e.keyCode == 76){
+    if(e.keyCode == 76 && twoPview)
         game.p2.dx = -game.p2.speed;
-    }
+    else if(e.keyCode == 76 && !twoPview)
+        game.p2.dy = -game.p2.speed;
 
     // Pressing 'I' on the keybord p2 moves up
-    if(e.keyCode == 73){
+    if(e.keyCode == 73 && twoPview)
         game.p2.dy = game.p2.speed;
-    }
+    else if(e.keyCode == 73 && !twoPview)
+        game.p2.dx = -game.p2.speed;
 
     // Pressing 'K' on the keybord p2 moves down
-    if(e.keyCode == 75){
+    if(e.keyCode == 75 && twoPview)
         game.p2.dy = -game.p2.speed;
-    }
+    else if(e.keyCode == 75 && !twoPview)
+        game.p2.dx = game.p2.speed;
 }
 
 function release(e){
-    if (e.keyCode == 65 || e.keyCode == 68){
+    if ((e.keyCode == 65 || e.keyCode == 68) && twoPview)
         game.p1.dx = 0;
-    }
-    if (e.keyCode == 87 || e.keyCode == 83){
+    else if ((e.keyCode == 65 || e.keyCode == 68) && !twoPview)
         game.p1.dy = 0;
-    }
-    if (e.keyCode == 74 || e.keyCode == 76){
+
+    if ((e.keyCode == 87 || e.keyCode == 83) && twoPview)
+        game.p1.dy = 0;
+    else if ((e.keyCode == 87 || e.keyCode == 83) && !twoPview)
+        game.p1.dx = 0;
+
+    if ((e.keyCode == 74 || e.keyCode == 76) && twoPview)
         game.p2.dx = 0;
-    }
-    if (e.keyCode == 73 || e.keyCode == 75){
+    else if ((e.keyCode == 74 || e.keyCode == 76) && !twoPview)
         game.p2.dy = 0;
-    }
+
+    if ((e.keyCode == 73 || e.keyCode == 75) && twoPview)
+        game.p2.dy = 0;
+    else if ((e.keyCode == 73 || e.keyCode == 75) && !twoPview)
+        game.p2.dx = 0;
 }
 
 function checkPress(e){

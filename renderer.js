@@ -333,7 +333,7 @@ function initGraphics(game){
 
     var vao_p2 = gl.createVertexArray();
     var count2 = setVaoFromColor(gl, paddle(), program, [0,255,0,255], 1, vao_p2);
-    var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,0), utils.MakeScaleMatrix(220));
+    var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,3), utils.MakeScaleMatrix(220));
 
     var vao_p3 = gl.createVertexArray();
     var count3 = setVaoFromColor(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, [0,0,0,255], 2, vao_p3);
@@ -349,7 +349,7 @@ function initGraphics(game){
     var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]);
     var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]);
-    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[0,1,0]);
+    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[-1,0,0]);
 
     clear(gl);
     var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1,0);
