@@ -180,8 +180,7 @@ function setVaoFromImage(gl, vectors, program, image, tex_id, vao){ // vao is th
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     // Fill the texture with a 1x1 blue pixel until the image is loaded
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                  new Uint8Array([0, 0, 255, 255]));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
 
     //when the image is loaded, put its data inside the texture
     image.addEventListener('load', function() { setStuff(gl, vao, texture, image,tex_id); });
@@ -234,8 +233,7 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
 
     gl.enableVertexAttribArray(texCoordAttributeLocation);
-    gl.vertexAttribPointer(
-        texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
     var texture = gl.createTexture();
 

@@ -194,25 +194,29 @@ class Table{
 
 }
 
+// paddle radius: 4inches
+// disk radius: 3.25inches
+// table dimensions: 93x45inches
+// goals width: 13inches
 class Game{
 
     constructor(){
-        this.p1 = new Paddle(15);
+        this.p1 = new Paddle(8);
         this.p1.y = 120;
         this.p1.dx = 0;
         this.p1.dy = 0;
 
-        this.p2 = new Paddle(15);
+        this.p2 = new Paddle(8);
         this.p2.y = -120;
         this.p2.dx = 0;
         this.p2.dy = 0.0;
 
-        this.disk = new Disk(10);
+        this.disk = new Disk(6.5);
 
-        this.right = new Border(100, "v", 0);
-        this.left = new Border(-100, "v", 0);
-        this.top = new Border(150, "h", 40);
-        this.bottom = new Border(-150, "h", 40);
+        this.right = new Border(90, "v", 0);
+        this.left = new Border(-90, "v", 0);
+        this.top = new Border(186, "h", 26);
+        this.bottom = new Border(-186, "h", 26);
 
         this.obstacles = [];
         this.obstacles.push(this.p1);
