@@ -7,7 +7,6 @@ var vertexShaderSource = `#version 300 es
 in vec3 a_position;
 
 in vec3 a_normal;
-out vec3 normal;
 
 out vec3 cameraCoord;
 out vec3 cameraNormal;
@@ -28,8 +27,6 @@ void main() {
 // is responsible for setting
 
 v_texCoord = a_texCoord;
-
-normal = normalize(mat3(mat_n)*a_normal); // to turn normal arrays in the right position
 
 gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on the screen in the canvas
 
@@ -57,49 +54,43 @@ in vec3 cameraNormal;
 uniform sampler2D u_image;
 uniform mat4 view;
 
-in vec3 normal;
-
-vec3 Ldir = normalize(vec3(0.0,1.0,0.0)); // coordinates of the light
-vec4 Lcol = vec4(1.0,1.0,1.0,1.0);
-
 void main() {
 vec3 cm = normalize(cameraNormal);
-Ldir = mat3(view)*Ldir;
 vec4 color = texture(u_image, v_texCoord);
-vec4 f_diffuse = color*Lcol*clamp(dot(Ldir,cm),0.0,1.0); // calculates the f_diffuse
 
-// phong
-float cross_prod = dot(Ldir, cm);
-vec3 n_prime = cm*cross_prod;
-vec3 r = 2.0*n_prime - Ldir;
-vec4 f_specular = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(normalize(0.0 - cameraCoord),r),0.0,1.0), 128.0); // calculates the f_specular
-
-// blynn
-vec3 h = normalize(Ldir + normalize(0.0 - cameraCoord));
-vec4 f_s = vec4(1.0,1.0,1.0,1.0)*pow(clamp(dot(cm,h),0.0,1.0), 128.0);
 
 // point lights
-vec4 Lps = vec4(0.7,0.7,0.7,1.0); //speculat light color
-float g = 60.0; //target distance for decay
+vec4 Lps = vec4(0.7,0.7,0.7,1.0); //specular light color
+vec3 eyeDir = normalize(0.0 - cameraCoord);
+float g = 70.0; //target distance for decay
+float beta = 0.6; //decay factor
 
-vec3 Lpoint = (view*vec4(0.0,200.0,100.0,1.0)).xyz; // position of point light
+vec3 Lpoint = (view*vec4(0.0,300.0,100.0,1.0)).xyz; // position of point light
 vec3 Lpoint_dir = normalize(Lpoint - cameraCoord); // computes light direction
-float decay = pow(g / length(Lpoint - cameraCoord), 0.5);
+float decay = pow(g / length(Lpoint - cameraCoord), beta);
 vec4 point_diff = color*clamp(dot(Lpoint_dir, cm),0.0,1.0);
-vec3 h_point = normalize(Lpoint_dir + normalize(0.0 - cameraCoord));
-vec4 point_spec = Lps*pow(clamp(dot(cm,h),0.0,1.0),128.0);
+vec3 h_point = normalize(Lpoint_dir + eyeDir);
+vec4 point_spec = Lps*pow(clamp(dot(cm,h_point),0.0,1.0),128.0);
 vec4 l1 = vec4(decay*(point_diff.xyz + point_spec.xyz),1.0);
 
-Lpoint = (view*vec4(0.0,200.0,-100.0,1.0)).xyz;
+Lpoint = (view*vec4(0.0,300.0,-100.0,1.0)).xyz;
 Lpoint_dir = normalize(Lpoint - cameraCoord);
-decay = pow(g / length(Lpoint - cameraCoord), 0.5);
+decay = pow(g / length(Lpoint - cameraCoord), beta);
 point_diff = color*clamp(dot(Lpoint_dir, cm),0.0,1.0);
-h_point = normalize(Lpoint_dir + normalize(0.0 - cameraCoord));
-point_spec = Lps*pow(clamp(dot(cm,h),0.0,1.0),128.0);
+h_point = normalize(Lpoint_dir + eyeDir);
+point_spec = Lps*pow(clamp(dot(cm,h_point),0.0,1.0),128.0);
 vec4 l2 = vec4(decay*(point_diff.xyz + point_spec.xyz),1.0);
 
-outColor = l1 + l2;
-//outColor = vec4(f_diffuse.xyz + f_specular.xyz, 1.0);
+//directional light
+vec3 Ldir = normalize(mat3(view)*normalize(vec3(0.0,1.0,0.0)));
+float n = 0.1;
+vec4 Lcol = vec4(n,n,n,1.0);
+vec4 f_diff = color*Lcol*clamp(dot(Ldir,cm),0.0,1.0);
+vec4 l3 = vec4(f_diff.xyz, 1);
+
+
+outColor =  l1 + l2 + l3;
+
 
 }
 `;

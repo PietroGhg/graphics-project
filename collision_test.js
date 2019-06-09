@@ -201,12 +201,12 @@ class Table{
 class Game{
 
     constructor(){
-        this.p1 = new Paddle(8);
+        this.p1 = new Paddle(14.5);
         this.p1.y = 150;
         this.p1.dx = 0;
         this.p1.dy = 0;
 
-        this.p2 = new Paddle(8);
+        this.p2 = new Paddle(14.5);
         this.p2.y = -150;
         this.p2.dx = 0;
         this.p2.dy = 0.0;
