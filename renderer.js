@@ -355,7 +355,7 @@ function initGraphics(game){
     img.src = "table.png";
     img.crossOrigin = "anonymous";
     var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t);
-    var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(180, 200, 240));
+    var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(220, 200, 220));
 
     var proj = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
     var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]);

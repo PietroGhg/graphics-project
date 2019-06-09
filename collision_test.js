@@ -43,7 +43,7 @@ class Border{
             }
             else if(this.direction == "h" && disk.y + disk.dy + disk.radius >= this.limit){
                 //goal
-                if (disk.x + disk.radius >= -this.goal && disk.x  + disk.radius <= this.goal){
+                if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
                         setTimeout(() => {disk.vis = false;}, 100);
@@ -75,7 +75,7 @@ class Border{
             }
             else if(this.direction == "h" && disk.y + disk.dy - disk.radius <= this.limit){
                 //goal
-                if (disk.x + disk.radius >= -this.goal && disk.x + disk.radius <= this.goal){
+                if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
                         setTimeout(() => {disk.vis = false;}, 100);
@@ -202,12 +202,12 @@ class Game{
 
     constructor(){
         this.p1 = new Paddle(8);
-        this.p1.y = 120;
+        this.p1.y = 150;
         this.p1.dx = 0;
         this.p1.dy = 0;
 
         this.p2 = new Paddle(8);
-        this.p2.y = -120;
+        this.p2.y = -150;
         this.p2.dx = 0;
         this.p2.dy = 0.0;
 
@@ -215,8 +215,8 @@ class Game{
 
         this.right = new Border(90, "v", 0);
         this.left = new Border(-90, "v", 0);
-        this.top = new Border(186, "h", 26);
-        this.bottom = new Border(-186, "h", 26);
+        this.top = new Border(186, "h", 44);
+        this.bottom = new Border(-186, "h", 44);
 
         this.obstacles = [];
         this.obstacles.push(this.p1);
