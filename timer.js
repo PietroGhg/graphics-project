@@ -1,5 +1,5 @@
 //set minutes
-var mins = 0.5;
+var mins = 3;
 
 //calculate the seconds
 var secs = mins * 60;
