@@ -15,8 +15,7 @@ keys.push(new Key(76));
 keys.push(new Key(73));
 keys.push(new Key(75));
 
-window.addEventListener("keydown", checkPress, false);
-window.addEventListener("keyup", checkPress, false);
+
 
 function action(e){
     // Pressing 'A' on the keybord p1 moves left

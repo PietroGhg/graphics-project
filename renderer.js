@@ -398,6 +398,21 @@ function animate(gl, todraw, projs, views){
     window.requestAnimationFrame(function(){ animate(gl, todraw, projs, views);});
 }
 
+function startup(gl, todraw, angle){
+    var proj = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 1000);
+    var d = 250;
+    var view = utils.MakeLookAt([d*Math.cos(angle), 250, d*Math.sin(angle)],[0,0,0],[0,1,0]);
+    clear(gl);
+    drawScene(gl, todraw, 0, gl.canvas.width, proj, view);
+    if(playstartup)
+	window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); });
+    else{
+	window.addEventListener("keydown", checkPress, false);
+	window.addEventListener("keyup", checkPress, false);
+	animate(gl, todraw, projs, views);
+    }
+}
+
 
 //main
 var game = new Game();
@@ -406,5 +421,8 @@ var todraw; //array of objects to be drawn
 var views; //view matricies for the two players
 var projs;
 var twoPview = true;
+var playstartup = true;
 [gl, todraw, projs, views] = initGraphics(game); //initializes the buffers ecc
-animate(gl, todraw, projs, views); //animates the game and draws the scenes
+//animate(gl, todraw, projs, views); //animates the game and draws the scenes
+startup(gl, todraw, 0);
+window.addEventListener("keypress", function(e){ if(e.keyCode == 32) playstartup = false; });
