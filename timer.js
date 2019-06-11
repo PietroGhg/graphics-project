@@ -33,13 +33,14 @@ function Decrement() {
         }
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
-            if (document.getElementById("p1").innerHTML > document.getElementById("p2").innerHTML){
+            if (game.p1.points > game.p2.points){
                 if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){window.location.reload();}
             }
-            else if (document.getElementById("p1").innerHTML < document.getElementById("p2").innerHTML){
+            else if (game.p1.points < game.p2.points){
                 if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){window.location.reload();}
             }
             else {
+		console.log("1: " + document.getElementById("p1").innerHTML + " :  " + document.getElementById("p2").innerHTML);
                 if(!alert('Game Over!\n\n🏅 Tie! 🏅')){window.location.reload();}
             }
             minutes.value = 0;

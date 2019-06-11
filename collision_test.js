@@ -58,7 +58,6 @@ class Border{
                                           p2.y = -120;
                                           p2.points++;
                                           document.getElementById("p2").innerHTML = p2.points;
-                                          console.log(p2.points);
                                           this.goal2 = false;
                                          }, 1500);
                     }
@@ -90,7 +89,6 @@ class Border{
                                           p2.y = -120;
                                           p1.points++;
                                           document.getElementById("p1").innerHTML = p1.points;
-                                          console.log(p1.points);
                                           this.goal1 = false;
                                          }, 1500);
                     }
@@ -106,6 +104,7 @@ class Border{
     handleCollision(disk){
         if(this.direction == "h"){
             disk.dy = -disk.dy;
+
         }
         else{
             disk.dx = -disk.dx;
@@ -161,8 +160,6 @@ class Paddle{
         var posD = [disk.x, disk.y];
         var posP = [this.x, this.y];
         var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 0.4)); 
-        console.log("pos " + disk.x + " " + disk.y);
-        console.log("speed " + disk.x + " " + disk.y);
         disk.x = this.x + newD[0];
         disk.y = this.y + newD[1];
         //update the disk
