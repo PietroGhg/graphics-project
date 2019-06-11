@@ -6,7 +6,7 @@ var secs = mins * 60;
 
 //countdown function is evoked when page is loaded
 function countdown() {
-    setTimeout('Decrement()', 60);
+    window.addEventListener("keypress", function(e){ if(e.keyCode == 32) setTimeout('Decrement()', 60); });
 }
 
 //Decrement function decrement the value
@@ -40,7 +40,7 @@ function Decrement() {
                 if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){window.location.reload();}
             }
             else {
-		console.log("1: " + document.getElementById("p1").innerHTML + " :  " + document.getElementById("p2").innerHTML);
+                console.log("1: " + document.getElementById("p1").innerHTML + " :  " + document.getElementById("p2").innerHTML);
                 if(!alert('Game Over!\n\n🏅 Tie! 🏅')){window.location.reload();}
             }
             minutes.value = 0;

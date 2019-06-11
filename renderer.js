@@ -405,11 +405,12 @@ function startup(gl, todraw, angle){
     clear(gl);
     drawScene(gl, todraw, 0, gl.canvas.width, proj, view);
     if(playstartup)
-	window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); });
+        window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); });
     else{
-	window.addEventListener("keydown", checkPress, false);
-	window.addEventListener("keyup", checkPress, false);
-	animate(gl, todraw, projs, views);
+        window.addEventListener("keydown", checkPress, false);
+        window.addEventListener("keyup", checkPress, false);
+        animate(gl, todraw, projs, views);
+        document.getElementById("spacebar").innerHTML = "";
     }
 }
 
