@@ -6,7 +6,11 @@ var secs = mins * 60;
 
 //countdown function is evoked when page is loaded
 function countdown() {
-    window.addEventListener("keypress", function(e){ if(e.keyCode == 32) setTimeout('Decrement()', 60); });
+    mins = 3;
+    secs = mins * 60;
+    document.getElementById("minutes").innerHTML = mins;
+    document.getElementById("seconds").innerHTML = 0;
+    setTimeout('Decrement()', 60);
 }
 
 //Decrement function decrement the value
@@ -34,14 +38,16 @@ function Decrement() {
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
             if (game.p1.points > game.p2.points){
-                if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){window.location.reload();}
+		if(playing)p1Win.play();
+		if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
             }
             else if (game.p1.points < game.p2.points){
-                if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){window.location.reload();}
+		if(playing)p2Win.play();
+		if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
             }
             else {
-                console.log("1: " + document.getElementById("p1").innerHTML + " :  " + document.getElementById("p2").innerHTML);
-                if(!alert('Game Over!\n\n🏅 Tie! 🏅')){window.location.reload();}
+                if(playing)tie.play();
+                if(!alert('Game Over!\n\n🏅 Tie! 🏅')){game.reset(); resetHTMLPoints();}
             }
             minutes.value = 0;
             seconds.value = 0;
@@ -63,4 +69,9 @@ function getminutes() {
 function getseconds() {
     //take minutes remaining (as seconds) away from total seconds remaining
     return secs - Math.round(mins * 60);
+}
+
+function resetHTMLPoints(){
+    document.getElementById("p1").innerHTML = 0;
+    document.getElementById("p2").innerHTML = 0;
 }

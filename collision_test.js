@@ -11,6 +11,15 @@ class Disk{
         this.vis = true;
     }
 
+    reset(){
+	this.x = 0;
+        this.y = 0;
+        this.dx = 0;
+        this.dy = 0;
+        this.vis = true;
+    }
+	
+
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
@@ -32,6 +41,7 @@ class Border{
         this.direction = direction;
         this.goal = goal;
 
+	//flags to tell if one of the players has just scored
         this.goal1 = false;
         this.goal2 = false;
     }
@@ -45,17 +55,10 @@ class Border{
                 //goal
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal2 == false){
+			if(playing)goal.play();
                         this.goal2 = true;
                         setTimeout(() => {disk.vis = false;}, 100);
-                        setTimeout(() => {disk.x = 0;
-                                          disk.y = 0;
-                                          disk.dx = 0;
-                                          disk.dy = 0;
-                                          disk.vis = true;
-                                          p1.x = 0;
-                                          p1.y = 120;
-                                          p2.x = 0;
-                                          p2.y = -120;
+                        setTimeout(() => {game.resetPositions();
                                           p2.points++;
                                           document.getElementById("p2").innerHTML = p2.points;
                                           this.goal2 = false;
@@ -77,16 +80,9 @@ class Border{
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
+			if(playing)goal.play();
                         setTimeout(() => {disk.vis = false;}, 100);
-                        setTimeout(() => {disk.x = 0;
-                                          disk.y = 0;
-                                          disk.dx = 0;
-                                          disk.dy = 0;
-                                          disk.vis = true;
-                                          p1.x = 0;
-                                          p1.y = 120;
-                                          p2.x = 0;
-                                          p2.y = -120;
+                        setTimeout(() => {game.resetPositions();
                                           p1.points++;
                                           document.getElementById("p1").innerHTML = p1.points;
                                           this.goal1 = false;
@@ -127,6 +123,21 @@ class Paddle{
         this.vis = true;
     }
 
+    resetPosition(){
+	this.x = 0;
+	this.dx = 0;
+	this.dy = 0;
+    }
+
+    reset(){
+	this.x = 0;
+        this.dx = 0;
+        this.dy = 0;
+        this.points = 0;
+        this.vis = true;
+    }
+	
+
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
@@ -159,7 +170,7 @@ class Paddle{
         //positions the disk on the radial vector that connects the centers, and a distance sligthly greater than the radiuses
         var posD = [disk.x, disk.y];
         var posP = [this.x, this.y];
-        var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 0.4)); 
+        var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 2)); 
         disk.x = this.x + newD[0];
         disk.y = this.y + newD[1];
         //update the disk
@@ -169,6 +180,7 @@ class Paddle{
             disk.dy = v[1] + this.dy;
         }
         disk.bump();
+	sound.play();
     }
 
     normalizeSpeed(){
@@ -230,6 +242,23 @@ class Game{
         this.borders.push(this.bottom);
 
         this.table = new Table();
+    }
+
+    resetPositions(){
+	this.disk.reset();
+	this.p1.resetPosition();
+	this.p1.y = 150;
+	this.p2.resetPosition();
+	this.p2.y = -150;
+    }
+
+    reset(){
+	this.p1.reset();
+	this.p1.y = 150;
+	this.p2.reset();
+	this.p2.y = -150;
+	this.disk.reset();
+	countdown();
     }
 
     checkColl(paddle){

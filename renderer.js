@@ -8,15 +8,14 @@ in vec3 a_position;
 
 in vec3 a_normal;
 
-out vec3 cameraCoord;
-out vec3 cameraNormal;
+out vec3 cameraCoord; //position in camera space
+out vec3 cameraNormal; //normals in camera space
 
 in vec2 a_texCoord;
 out vec2 v_texCoord;
 
 uniform mat4 mat; // world-view-projection matrix
 uniform mat4 matWV; // world-view matrix
-uniform mat4 mat_n; // normal arrays
 uniform mat4 mat_nWV; // world-view normal arrays
 
 
@@ -196,6 +195,7 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
     // turn on vao
     gl.bindVertexArray(vao);
 
+    //fills the buffers with positiins, indices, normals, and texture coordinates
     var vertexBuffer = gl.createBuffer();
     var vertexLocation = gl.getAttribLocation(program, "a_position");
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -251,6 +251,16 @@ function setStuff(gl, vao, texture, image, tex_id){
     gl.generateMipmap(gl.TEXTURE_2D); 
 }
 
+/*class for a object to be drawn
+receives: 
+-the gl context
+-the vertex array referring to all the necessary buffers
+-the shaders
+-the initial world matrix, used to perform initial scaling/translation to adapt to world space
+-the number of elements to be drawn
+-the game object to be drawn (paddle, disk or table), which contains a reference to the position of the object in the game
+-the texture id the identifies the proper texture to be used to color the object
+*/
 class Drawable{
 
     constructor(gl, vao, program, world, count, obj, tex_id){
@@ -263,17 +273,19 @@ class Drawable{
         this.tex_id = tex_id;
     }
 
+    //draws the object, receives the projection and the view matrix in order to allow difference persepectives of the game
     draw(proj, view){
         if(this.obj.vis){
+	    //computes the world matrix starting from the initial world matrix and translating by the position of the object in the game
             var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
             var gl = this.gl;
+	    //activates the shaders and the vertex array object
             gl.useProgram(this.program);
             gl.bindVertexArray(this.vao);
 
-            var mat = utils.multiplyMatrices(proj, utils.multiplyMatrices(view, temp_world));
-            var matWV = utils.multiplyMatrices(view, temp_world);
-            var mat_n = utils.transposeMatrix(utils.invertMatrix(temp_world));
-            var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV));
+            var mat = utils.multiplyMatrices(proj, utils.multiplyMatrices(view, temp_world)); //world-view-projection matrix
+            var matWV = utils.multiplyMatrices(view, temp_world); //world-view, used to compute the positions in camera space
+            var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV)); //normal matrix in camera space
 
             // associates world-view-projection matrix with shader
             var matLocation = gl.getUniformLocation(this.program, "mat");
@@ -283,17 +295,15 @@ class Drawable{
             var matWVlocation = gl.getUniformLocation(this.program, "matWV");
             gl.uniformMatrix4fv(matWVlocation, true, matWV);
 
+	    //sets the proper texture 
             var imageLocation = gl.getUniformLocation(this.program, "u_image");
             gl.uniform1i(imageLocation, this.tex_id);
 
-            // associates normal arrays with shader
-            var mat_nLocation = gl.getUniformLocation(this.program, "mat_n");
-            gl.uniformMatrix4fv(mat_nLocation, true, mat_n);
-
-            // associates normal arrays with shader
+            // associates normal arrays matrix with shader
             var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
             gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
 
+	    //associates view matrix with the shader
             var viewLocation = gl.getUniformLocation(this.program, "view");
             gl.uniformMatrix4fv(viewLocation, true, view);
 
@@ -322,36 +332,40 @@ function initGraphics(game){
     if (!gl) {
         return;
     }
-
+    //compiles shaders and creates a program
     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
     var program = createProgram(gl, vertexShader, fragmentShader);
 
+    //vertex array object for the paddle of the first player
     var vao_p1 = gl.createVertexArray();
-    var count = setVaoFromColor(gl, paddle(), program, [255,0,0,255], 0, vao_p1);
+    var count = setVaoFromColor(gl, paddle(), program, [255,0,0,255], 0, vao_p1); //receives a paddle model, colors in with a red texture
     var world_p1 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,10), utils.MakeScaleMatrix(220));
 
+    //vao for the paddle of the second player
     var vao_p2 = gl.createVertexArray();
-    var count2 = setVaoFromColor(gl, paddle(), program, [0,255,0,255], 1, vao_p2);
+    var count2 = setVaoFromColor(gl, paddle(), program, [0,255,0,255], 1, vao_p2); //green texture
     var world_p2 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,3), utils.MakeScaleMatrix(220));
 
+    //vao for the disk
     var vao_p3 = gl.createVertexArray();
-    var count3 = setVaoFromColor(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, [0,0,0,255], 2, vao_p3);
+    var count3 = setVaoFromColor(gl, createCil(5,game.disk.radius,[0.0,0.0,0.0,1.0]), program, [0,0,0,255], 2, vao_p3); //cilinder with black texture
 
+    //vao for the table
     var vao_t = gl.createVertexArray();
     var img = new Image();
     img.src = "table.png";
     img.crossOrigin = "anonymous";
-    var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t);
+    var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t); //table model with texture loaded from file
     var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(210, 200, 225));
 
-    var proj1 = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000);
-    var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000);
-    var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]);
-    var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]);
-    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[-1,0,0]);
+    var proj1 = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000); //projection matrix for the split screen (half of the canvas width)
+    var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000); //projection matrix for full screen
+    var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]); //view for player1
+    var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]); //view for player2
+    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[-1,0,0]); //view for full screen
 
-    clear(gl);
+    //creates one drawable object for each element to be drawn
     var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1,0);
     var d2 = new Drawable(gl, vao_p2, program, world_p2, count2, game.p2,1);
     var d3 = new Drawable(gl, vao_p3, program, utils.identityMatrix(), count3, game.disk,2);
@@ -400,16 +414,19 @@ function animate(gl, todraw, projs, views){
 
 function startup(gl, todraw, angle){
     var proj = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 1000);
-    var d = 250;
-    var view = utils.MakeLookAt([d*Math.cos(angle), 250, d*Math.sin(angle)],[0,0,0],[0,1,0]);
+    var d = 250; //distance of the camera from the center of the table
+    var view = utils.MakeLookAt([d*Math.cos(angle), 250, d*Math.sin(angle)],[0,0,0],[0,1,0]); //the camera rotates around the center
     clear(gl);
     drawScene(gl, todraw, 0, gl.canvas.width, proj, view);
     if(playstartup)
-        window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); });
+        window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); }); //increases the angle
     else{
+	//after the user has pressed spacebar and the startup screen
+	//associates the event listeners of the action keys
         window.addEventListener("keydown", checkPress, false);
         window.addEventListener("keyup", checkPress, false);
-        animate(gl, todraw, projs, views);
+        animate(gl, todraw, projs, views); //game begins
+	countdown(); //start timer
         document.getElementById("spacebar").innerHTML = "";
     }
 }
@@ -419,11 +436,11 @@ function startup(gl, todraw, angle){
 var game = new Game();
 var gl; //webgl context
 var todraw; //array of objects to be drawn
-var views; //view matricies for the two players
-var projs;
-var twoPview = true;
-var playstartup = true;
+var views; //view matricies for the two players and the full screen
+var projs; //projection matricies for split screen or full screen
+var twoPview = true; //true if split screen enabled
+var playstartup = true; //true if startup animation is playing 
+
 [gl, todraw, projs, views] = initGraphics(game); //initializes the buffers ecc
-//animate(gl, todraw, projs, views); //animates the game and draws the scenes
 startup(gl, todraw, 0);
-window.addEventListener("keypress", function(e){ if(e.keyCode == 32) playstartup = false; });
+window.addEventListener("keypress", function(e){ if(e.keyCode == 32) playstartup = false; }); //when spacebar is pressed, stop startup animation
