@@ -330,7 +330,7 @@ function initGraphics(game){
     var gl = canvas.getContext("webgl2");
 
     if (!gl) {
-        return;
+        return null;
     }
     //compiles shaders and creates a program
     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
@@ -371,10 +371,13 @@ function initGraphics(game){
     var d3 = new Drawable(gl, vao_p3, program, utils.identityMatrix(), count3, game.disk,2);
     var d4 = new Drawable(gl, vao_t, program,  world_t, count_t, game.table,3);
     var todraw = [d1,d2,d3,d4];
-    var views = [view1, view2, view3];
-    var projs = [proj1, proj2];
+    var views = {viewp1:view1, viewp2:view2, viewFull: view3};
+    var projs = {projSplit:proj1, projFull: proj2};
 
-    return [gl, todraw, projs, views];
+    return {gl:gl,
+	    todraw: todraw,
+	    projs: projs,
+	    views: views};
 }
 
 //renders the scene for one player, setting the viewport
@@ -390,57 +393,42 @@ function drawScene(gl, todraw, x, width, proj, view){
 
 //animates the scene by making every object of the game step
 //and calling drawScene() twice, once for each player
-function animate(gl, todraw, projs, views){
-    var view1 = views[0];
-    var view2 = views[1];
-    var view3 = views[2];
-    var proj2p = projs[0];
-    var proj1p = projs[1];
+function animate(graphics){
 
     game.checkAndStep();
 
     if(twoPview){
-        clear(gl);
-        drawScene(gl, todraw, 0, gl.canvas.width/2, proj2p, view1);
-        drawScene(gl, todraw, gl.canvas.width/2, gl.canvas.width/2, proj2p, view2);
+        clear(graphics.gl);
+        drawScene(graphics.gl, graphics.todraw, 0, graphics.gl.canvas.width/2, graphics.projs.projSplit, graphics.views.viewp1);
+        drawScene(graphics.gl, graphics.todraw, graphics.gl.canvas.width/2, graphics.gl.canvas.width/2, graphics.projs.projSplit, graphics.views.viewp2);
     }
     else{
-        clear(gl);
-        drawScene(gl, todraw, 0, gl.canvas.width, proj1p, view3);
+        clear(graphics.gl);
+        drawScene(graphics.gl, graphics.todraw, 0, graphics.gl.canvas.width, graphics.projs.projFull, graphics.views.viewFull);
     }
 
-    window.requestAnimationFrame(function(){ animate(gl, todraw, projs, views);});
+    window.requestAnimationFrame(function(){ animate(graphics);});
 }
 
-function startup(gl, todraw, angle){
-    var proj = utils.MakePerspective(90, gl.canvas.width/gl.canvas.height, 0.1, 1000);
+function startup(graphics, angle){
+
+    var proj = utils.MakePerspective(90, graphics.gl.canvas.width/graphics.gl.canvas.height, 0.1, 1000);
     var d = 250; //distance of the camera from the center of the table
     var view = utils.MakeLookAt([d*Math.cos(angle), 250, d*Math.sin(angle)],[0,0,0],[0,1,0]); //the camera rotates around the center
-    clear(gl);
-    drawScene(gl, todraw, 0, gl.canvas.width, proj, view);
+    clear(graphics.gl);
+    drawScene(graphics.gl, graphics.todraw, 0, graphics.gl.canvas.width, proj, view);
     if(playstartup)
-        window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); }); //increases the angle
+        window.requestAnimationFrame(function(){ startup(graphics, angle + 0.01); }); //increases the angle
     else{
         //after the user has pressed spacebar and the startup screen
         //associates the event listeners of the action keys
         window.addEventListener("keydown", checkPress, false);
         window.addEventListener("keyup", checkPress, false);
-        animate(gl, todraw, projs, views); //game begins
+        animate(graphics); //game begins
         countdown(); //start timer
         document.getElementById("spacebar").innerHTML = "";
     }
 }
 
 
-//main
-var game = new Game();
-var gl; //webgl context
-var todraw; //array of objects to be drawn
-var views; //view matricies for the two players and the full screen
-var projs; //projection matricies for split screen or full screen
-var twoPview = true; //true if split screen enabled
-var playstartup = true; //true if startup animation is playing 
 
-[gl, todraw, projs, views] = initGraphics(game); //initializes the buffers ecc
-startup(gl, todraw, 0);
-window.addEventListener("keypress", function(e){ if(e.keyCode == 32) playstartup = false; }); //when spacebar is pressed, stop startup animation

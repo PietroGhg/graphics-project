@@ -169,7 +169,7 @@ class Paddle{
         //positions the disk on the radial vector that connects the centers, and a distance sligthly greater than the radiuses
         var posD = [disk.x, disk.y];
         var posP = [this.x, this.y];
-        var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 2)); 
+        var newD = multiply2vc(norm2(n), (disk.radius + this.radius + 4)); 
         disk.x = this.x + newD[0];
         disk.y = this.y + newD[1];
         //update the disk
