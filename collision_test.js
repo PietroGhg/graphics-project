@@ -12,13 +12,13 @@ class Disk{
     }
 
     reset(){
-	this.x = 0;
+        this.x = 0;
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
         this.vis = true;
     }
-	
+
 
     step(){
         this.x = this.x + this.dx;
@@ -41,7 +41,7 @@ class Border{
         this.direction = direction;
         this.goal = goal;
 
-	//flags to tell if one of the players has just scored
+        //flags to tell if one of the players has just scored
         this.goal1 = false;
         this.goal2 = false;
     }
@@ -55,7 +55,7 @@ class Border{
                 //goal
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal2 == false){
-			if(playing)goal.play();
+                        if(playing)goal.play();
                         this.goal2 = true;
                         setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {game.resetPositions();
@@ -80,7 +80,7 @@ class Border{
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-			if(playing)goal.play();
+                        if(playing)goal.play();
                         setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {game.resetPositions();
                                           p1.points++;
@@ -100,7 +100,6 @@ class Border{
     handleCollision(disk){
         if(this.direction == "h"){
             disk.dy = -disk.dy;
-
         }
         else{
             disk.dx = -disk.dx;
@@ -124,19 +123,19 @@ class Paddle{
     }
 
     resetPosition(){
-	this.x = 0;
-	this.dx = 0;
-	this.dy = 0;
+        this.x = 0;
+        this.dx = 0;
+        this.dy = 0;
     }
 
     reset(){
-	this.x = 0;
+        this.x = 0;
         this.dx = 0;
         this.dy = 0;
         this.points = 0;
         this.vis = true;
     }
-	
+
 
     step(){
         this.x = this.x + this.dx;
@@ -180,7 +179,7 @@ class Paddle{
             disk.dy = v[1] + this.dy;
         }
         disk.bump();
-	sound.play();
+        sound.play();
     }
 
     normalizeSpeed(){
@@ -245,20 +244,20 @@ class Game{
     }
 
     resetPositions(){
-	this.disk.reset();
-	this.p1.resetPosition();
-	this.p1.y = 150;
-	this.p2.resetPosition();
-	this.p2.y = -150;
+        this.disk.reset();
+        this.p1.resetPosition();
+        this.p1.y = 150;
+        this.p2.resetPosition();
+        this.p2.y = -150;
     }
 
     reset(){
-	this.p1.reset();
-	this.p1.y = 150;
-	this.p2.reset();
-	this.p2.y = -150;
-	this.disk.reset();
-	countdown();
+        this.p1.reset();
+        this.p1.y = 150;
+        this.p2.reset();
+        this.p2.y = -150;
+        this.disk.reset();
+        countdown();
     }
 
     checkColl(paddle){

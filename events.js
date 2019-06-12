@@ -72,12 +72,12 @@ function action(e){
         p2down = 1;
     else if(e.keyCode == 75 && !twoPview)
         p2left = 1;
-    
+
     calculateSpeed();
 }
 
 function release(e){
-    //A
+    // Pressing 'A' on the keybord p1 moves right
     if(e.keyCode == 65 && twoPview)
         p1left = 0;
     else if(e.keyCode == 65 && !twoPview)
@@ -100,8 +100,8 @@ function release(e){
         p1down = 0;
     else if(e.keyCode == 83 && !twoPview)
         p1right = 0;
-    
-        // Pressing 'J' on the keybord p2 moves left
+
+    // Pressing 'J' on the keybord p2 moves left
     if(e.keyCode == 74 && twoPview)
         p2left = 0;
     else if(e.keyCode == 74 && !twoPview)
@@ -124,7 +124,7 @@ function release(e){
         p2down = 0;
     else if(e.keyCode == 75 && !twoPview)
         p2left = 0;
-    
+
     calculateSpeed();
 }
 

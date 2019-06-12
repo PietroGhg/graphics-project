@@ -276,10 +276,10 @@ class Drawable{
     //draws the object, receives the projection and the view matrix in order to allow difference persepectives of the game
     draw(proj, view){
         if(this.obj.vis){
-	    //computes the world matrix starting from the initial world matrix and translating by the position of the object in the game
+            //computes the world matrix starting from the initial world matrix and translating by the position of the object in the game
             var temp_world = utils.multiplyMatrices(utils.MakeTranslateMatrix(this.obj.x, 0, this.obj.y), this.world);
             var gl = this.gl;
-	    //activates the shaders and the vertex array object
+            //activates the shaders and the vertex array object
             gl.useProgram(this.program);
             gl.bindVertexArray(this.vao);
 
@@ -295,7 +295,7 @@ class Drawable{
             var matWVlocation = gl.getUniformLocation(this.program, "matWV");
             gl.uniformMatrix4fv(matWVlocation, true, matWV);
 
-	    //sets the proper texture 
+            //sets the proper texture 
             var imageLocation = gl.getUniformLocation(this.program, "u_image");
             gl.uniform1i(imageLocation, this.tex_id);
 
@@ -303,7 +303,7 @@ class Drawable{
             var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
             gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
 
-	    //associates view matrix with the shader
+            //associates view matrix with the shader
             var viewLocation = gl.getUniformLocation(this.program, "view");
             gl.uniformMatrix4fv(viewLocation, true, view);
 
@@ -421,12 +421,12 @@ function startup(gl, todraw, angle){
     if(playstartup)
         window.requestAnimationFrame(function(){ startup(gl, todraw, angle + 0.01); }); //increases the angle
     else{
-	//after the user has pressed spacebar and the startup screen
-	//associates the event listeners of the action keys
+        //after the user has pressed spacebar and the startup screen
+        //associates the event listeners of the action keys
         window.addEventListener("keydown", checkPress, false);
         window.addEventListener("keyup", checkPress, false);
         animate(gl, todraw, projs, views); //game begins
-	countdown(); //start timer
+        countdown(); //start timer
         document.getElementById("spacebar").innerHTML = "";
     }
 }
