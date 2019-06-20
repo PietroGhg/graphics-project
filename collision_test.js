@@ -55,14 +55,14 @@ class Border{
                 //goal
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal2 == false){
-                        if(playing)goal.play();
                         this.goal2 = true;
+			p2.points++;
+			document.getElementById("p2").innerHTML = p2.points;
                         setTimeout(() => {disk.vis = false;}, 100);
-                        setTimeout(() => {game.resetPositions();
-                                          p2.points++;
-                                          document.getElementById("p2").innerHTML = p2.points;
+                        setTimeout(() => {game.resetPositions();                                
                                           this.goal2 = false;
                                          }, 1500);
+			if(playing)goal.play();
                     }
                 }
                 //collision
@@ -80,13 +80,13 @@ class Border{
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-                        if(playing)goal.play();
+			p1.points++;
+			document.getElementById("p1").innerHTML = p1.points;
                         setTimeout(() => {disk.vis = false;}, 100);
-                        setTimeout(() => {game.resetPositions();
-                                          p1.points++;
-                                          document.getElementById("p1").innerHTML = p1.points;
+                        setTimeout(() => {game.resetPositions();                                
                                           this.goal1 = false;
                                          }, 1500);
+			if(playing)goal.play();
                     }
                 }
                 //collision
@@ -252,13 +252,11 @@ class Game{
     }
 
     reset(){
+	this.disk.reset();
         this.p1.reset();
         this.p1.y = 150;
         this.p2.reset();
         this.p2.y = -150;
-        this.disk.reset();
-	document.getElementById("p1").innerHTML = 0;
-	document.getElementById("p2").innerHTML = 0;
         countdown();
     }
 
