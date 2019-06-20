@@ -257,6 +257,8 @@ class Game{
         this.p2.reset();
         this.p2.y = -150;
         this.disk.reset();
+	document.getElementById("p1").innerHTML = 0;
+	document.getElementById("p2").innerHTML = 0;
         countdown();
     }
 
