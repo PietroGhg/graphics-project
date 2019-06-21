@@ -363,7 +363,7 @@ function initGraphics(game){
     var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000); //projection matrix for full screen
     var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]); //view for player1
     var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]); //view for player2
-    var view3 = utils.MakeLookAt([0,250,0.1],[0,0,0],[-1,0,0]); //view for full screen
+    var view3 = utils.MakeLookAt([0,250,0],[0,0,0],[-1,0,0]); //view for full screen
 
     //creates one drawable object for each element to be drawn
     var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1,0);

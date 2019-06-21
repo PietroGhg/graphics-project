@@ -159,10 +159,14 @@ class Paddle{
         //rotate the velocity vector of the disk 
         var v = [disk.dx, disk.dy];
         var v1 = multiply2mv(m,v);
+	//rotate velocity of the paddle
+	var w = [this.dx, this.dy];
+	
         //to model the collision, simply invert the sign of the y coordinate of the rotated vector
         v1[1] = -v1[1];
         //bring back to the xy coordinates
         m = rotation2(-a);
+	w = multiply2mv(m,w); //rotate the velocity of the paddle in order to properly sum the two velocities
         v = multiply2mv(m,v1);
 
         //prevent sticking
@@ -174,9 +178,9 @@ class Paddle{
         disk.y = this.y + newD[1];
         //update the disk
 
-        if(Math.sqrt(Math.pow(v[0] + this.dx,2) + Math.pow(v[1] + this.dy, 2)) < maxV){
-            disk.dx = v[0] + this.dx;
-            disk.dy = v[1] + this.dy;
+        if(Math.sqrt(Math.pow(v[0] + w[0],2) + Math.pow(v[1] + w[1], 2)) < maxV){
+            disk.dx = v[0] + w[0];
+            disk.dy = v[1] + w[1];
         }
         disk.bump();
         sound.play();
