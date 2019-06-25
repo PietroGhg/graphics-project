@@ -100,9 +100,11 @@ class Border{
     handleCollision(disk){
         if(this.direction == "h"){
             disk.dy = -disk.dy;
+	    disk.y = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5; //to avoid sticking out of the border
         }
         else{
             disk.dx = -disk.dx;
+	    disk.x = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5;
         }
         disk.bump();
     }
