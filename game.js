@@ -19,7 +19,6 @@ class Disk{
         this.vis = true;
     }
 
-
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
@@ -56,13 +55,13 @@ class Border{
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal2 == false){
                         this.goal2 = true;
-			p2.points++;
-			document.getElementById("p2").innerHTML = p2.points;
+                        p2.points++;
+                        document.getElementById("p2").innerHTML = p2.points;
                         setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {game.resetPositions();                                
                                           this.goal2 = false;
                                          }, 1500);
-			if(playing)goal.play();
+                        if(playing)goal.play();
                     }
                 }
                 //collision
@@ -80,13 +79,13 @@ class Border{
                 if (Math.abs(disk.x) + disk.radius <= this.goal){
                     if(this.goal1 == false){
                         this.goal1 = true;
-			p1.points++;
-			document.getElementById("p1").innerHTML = p1.points;
+                        p1.points++;
+                        document.getElementById("p1").innerHTML = p1.points;
                         setTimeout(() => {disk.vis = false;}, 100);
                         setTimeout(() => {game.resetPositions();                                
                                           this.goal1 = false;
                                          }, 1500);
-			if(playing)goal.play();
+                        if(playing)goal.play();
                     }
                 }
                 //collision
@@ -100,11 +99,11 @@ class Border{
     handleCollision(disk){
         if(this.direction == "h"){
             disk.dy = -disk.dy;
-	    disk.y = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5; //to avoid sticking out of the border
+            disk.y = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5; //to avoid sticking out of the border
         }
         else{
             disk.dx = -disk.dx;
-	    disk.x = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5;
+            disk.x = this.limit < 0 ? this.limit + disk.radius + 0.5 : this.limit - disk.radius - 0.5;
         }
         disk.bump();
     }
@@ -138,7 +137,6 @@ class Paddle{
         this.vis = true;
     }
 
-
     step(){
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
@@ -161,14 +159,14 @@ class Paddle{
         //rotate the velocity vector of the disk 
         var v = [disk.dx, disk.dy];
         var v1 = multiply2mv(m,v);
-	//rotate velocity of the paddle
-	var w = [this.dx, this.dy];
-	
+        //rotate velocity of the paddle
+        var w = [this.dx, this.dy];
+
         //to model the collision, simply invert the sign of the y coordinate of the rotated vector
         v1[1] = -v1[1];
         //bring back to the xy coordinates
         m = rotation2(-a);
-	w = multiply2mv(m,w); //rotate the velocity of the paddle in order to properly sum the two velocities
+        w = multiply2mv(m,w); //rotate the velocity of the paddle in order to properly sum the two velocities
         v = multiply2mv(m,v1);
 
         //prevent sticking
@@ -258,7 +256,7 @@ class Game{
     }
 
     reset(){
-	this.disk.reset();
+        this.disk.reset();
         this.p1.reset();
         this.p1.y = 150;
         this.p2.reset();

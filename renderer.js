@@ -5,18 +5,16 @@ var vertexShaderSource = `#version 300 es
 // an attribute is an input (in) to a vertex shader
 // it will receive data from a buffer
 in vec3 a_position;
-
 in vec3 a_normal;
-
-out vec3 cameraCoord; //position in camera space
-out vec3 cameraNormal; //normals in camera space
-
 in vec2 a_texCoord;
-out vec2 v_texCoord;
+
+out vec3 cameraCoord; // position in camera space
+out vec3 cameraNormal; // normals in camera space
+out vec2 v_texCoord; // texture coordinates
 
 uniform mat4 mat; // world-view-projection matrix
 uniform mat4 matWV; // world-view matrix
-uniform mat4 mat_nWV; // world-view normal arrays
+uniform mat4 mat_nWV; // world-view normal vectors
 
 
 // all shaders have a main function
@@ -31,38 +29,36 @@ gl_Position = mat * vec4(a_position.xyz, 1); // exact position of the vertex on 
 
 cameraCoord = (matWV * vec4(a_position.xyz, 1)).xyz; // camera coordinates of object
 
-cameraNormal = mat3(mat_nWV) * a_normal; // camera coordinates of normal arrays
+cameraNormal = mat3(mat_nWV) * a_normal; // camera coordinates of normal vectors
 
 }
 `;
 
 var fragmentShaderSource = `#version 300 es
 
-// fragment shaders don't have a default precision so we need
-// to pick one. mediump is a good default. It means "medium precision"
+// fragment shaders don't have a default precision so we need to pick one. mediump is a good default. It means "medium precision"
 precision mediump float;
 
 // we need to declare an output for the fragment shader
 out vec4 outColor;
-in vec2 v_texCoord;
 
 in vec3 cameraCoord;
-
 in vec3 cameraNormal;
+in vec2 v_texCoord;
 
 uniform sampler2D u_image;
 uniform mat4 view;
 
+
 void main() {
 vec3 cm = normalize(cameraNormal);
-vec4 color = texture(u_image, v_texCoord);
-
+vec4 color = texture(u_image, v_texCoord); // color is relative to the u_image texture ID and should be in texCoord
 
 // point lights
-vec4 Lps = vec4(0.7,0.7,0.7,1.0); //specular light color
+vec4 Lps = vec4(0.7,0.7,0.7,1.0); // specular light color
 vec3 eyeDir = normalize(0.0 - cameraCoord);
-float g = 70.0; //target distance for decay
-float beta = 0.6; //decay factor
+float g = 70.0; // target distance for decay
+float beta = 0.6; // decay factor
 
 vec3 Lpoint = (view*vec4(0.0,300.0,100.0,1.0)).xyz; // position of point light
 vec3 Lpoint_dir = normalize(Lpoint - cameraCoord); // computes light direction
@@ -80,7 +76,7 @@ h_point = normalize(Lpoint_dir + eyeDir);
 point_spec = Lps*pow(clamp(dot(cm,h_point),0.0,1.0),128.0);
 vec4 l2 = vec4(decay*(point_diff.xyz + point_spec.xyz),1.0);
 
-//directional light
+// directional light
 vec3 Ldir = normalize(mat3(view)*normalize(vec3(0.0,1.0,0.0)));
 float n = 0.1;
 vec4 Lcol = vec4(n,n,n,1.0);
@@ -167,14 +163,13 @@ function setVaoFromImage(gl, vectors, program, image, tex_id, vao){ // vao is th
     gl.activeTexture(gl.TEXTURE0 + tex_id);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    // Fill the texture with a 1x1 blue pixel until the image is loaded
+    // fill the texture with a 1x1 blue pixel until the image is loaded
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
 
-    //when the image is loaded, put its data inside the texture
+    // when the image is loaded, put its data inside the texture
     image.addEventListener('load', function() { setStuff(gl, vao, texture, image,tex_id); });
 
-    // Set the parameters so we don't need mips and so we're not filtering
-    // and we don't repeat
+    // set the parameters so we don't need mips and so we're not filtering and we don't repeat
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -195,7 +190,7 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
     // turn on vao
     gl.bindVertexArray(vao);
 
-    //fills the buffers with positiins, indices, normals, and texture coordinates
+    // fills the buffers with positions, indices, normals, and texture coordinates
     var vertexBuffer = gl.createBuffer();
     var vertexLocation = gl.getAttribLocation(program, "a_position");
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -226,14 +221,14 @@ function setVaoFromColor(gl, vectors, program, color, tex_id, vao){ // vao is th
 
     var texture = gl.createTexture();
 
-    //activates and binds the right tex
+    // activates and binds the right tex
     gl.activeTexture(gl.TEXTURE0 + tex_id);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    // Fill the texture with the given color
+    // fill the texture with the given color
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(color));
 
-    // Set the parameters so we don't need mips and so we're not filtering and we don't repeat
+    // set the parameters so we don't need mips and so we're not filtering and we don't repeat
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -259,7 +254,7 @@ receives:
 -the initial world matrix, used to perform initial scaling/translation to adapt to world space
 -the number of elements to be drawn
 -the game object to be drawn (paddle, disk or table), which contains a reference to the position of the object in the game
--the texture id the identifies the proper texture to be used to color the object
+-the texture ID that identifies the proper texture to be used to color the object
 */
 class Drawable{
 
@@ -287,11 +282,11 @@ class Drawable{
             var matWV = utils.multiplyMatrices(view, temp_world); //world-view, used to compute the positions in camera space
             var mat_nWV = utils.transposeMatrix(utils.invertMatrix(matWV)); //normal matrix in camera space
 
-            // associates world-view-projection matrix with shader
+            //associates world-view-projection matrix with shader
             var matLocation = gl.getUniformLocation(this.program, "mat");
             gl.uniformMatrix4fv(matLocation, true, mat);
 
-            // associates world-view matrix with shader
+            //associates world-view matrix with shader
             var matWVlocation = gl.getUniformLocation(this.program, "matWV");
             gl.uniformMatrix4fv(matWVlocation, true, matWV);
 
@@ -299,11 +294,11 @@ class Drawable{
             var imageLocation = gl.getUniformLocation(this.program, "u_image");
             gl.uniform1i(imageLocation, this.tex_id);
 
-            // associates normal arrays matrix with shader
+            //associates normal vectors matrix with shader
             var mat_nWVLocation = gl.getUniformLocation(this.program, "mat_nWV");
             gl.uniformMatrix4fv(mat_nWVLocation, true, mat_nWV);
 
-            //associates view matrix with the shader
+            //associates view matrix with shader
             var viewLocation = gl.getUniformLocation(this.program, "view");
             gl.uniformMatrix4fv(viewLocation, true, view);
 
@@ -332,15 +327,17 @@ function initGraphics(game){
     if (!gl) {
         return null;
     }
+
     //compiles shaders and creates a program
     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
     var program = createProgram(gl, vertexShader, fragmentShader);
 
+    //vao contains buffers of objects and defines how many numbers take at a time for each buffer
     //vertex array object for the paddle of the first player
     var vao_p1 = gl.createVertexArray();
     var count = setVaoFromColor(gl, paddle(), program, [255,0,0,255], 0, vao_p1); //receives a paddle model, colors in with a red texture
-    var world_p1 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,10), utils.MakeScaleMatrix(220));
+    var world_p1 = utils.multiplyMatrices(utils.MakeTranslateMatrix(155,0,10), utils.MakeScaleMatrix(220)); //scales and translates initial model of the table
 
     //vao for the paddle of the second player
     var vao_p2 = gl.createVertexArray();
@@ -359,29 +356,36 @@ function initGraphics(game){
     var count_t = setVaoFromImage(gl, table(), program, img, 3, vao_t); //table model with texture loaded from file
     var world_t = utils.multiplyMatrices(utils.MakeRotateYMatrix(90), utils.MakeScaleNuMatrix(210, 200, 225));
 
-    var proj1 = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000); //projection matrix for the split screen (half of the canvas width)
+    var proj1 = utils.MakePerspective(90, (canvas.width/2)/canvas.height, 0.1, 1000); //projection matrix for split screen (half of the canvas width)
     var proj2 = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 1000); //projection matrix for full screen
     var view1 = utils.MakeLookAt([0,250,200],[0,0,0],[0,1,0]); //view for player1
     var view2 = utils.MakeLookAt([0,250,-200],[0,0,0],[0,1,0]); //view for player2
     var view3 = utils.MakeLookAt([0,250,0],[0,0,0],[-1,0,0]); //view for full screen
 
     //creates one drawable object for each element to be drawn
-    var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1,0);
-    var d2 = new Drawable(gl, vao_p2, program, world_p2, count2, game.p2,1);
-    var d3 = new Drawable(gl, vao_p3, program, utils.identityMatrix(), count3, game.disk,2);
-    var d4 = new Drawable(gl, vao_t, program,  world_t, count_t, game.table,3);
+    //program is the shader to be used
+    //world matrixes adapt table model (dimensions) to the game
+    //count is the number of triangles to be drawn
+    //game.obj is the object in game associated to the one to be drawn
+    //the last number is the texture ID
+    var d1 = new Drawable(gl, vao_p1, program, world_p1, count, game.p1, 0);
+    var d2 = new Drawable(gl, vao_p2, program, world_p2, count2, game.p2, 1);
+    var d3 = new Drawable(gl, vao_p3, program, utils.identityMatrix(), count3, game.disk, 2);
+    var d4 = new Drawable(gl, vao_t, program,  world_t, count_t, game.table, 3);
     var todraw = [d1,d2,d3,d4];
+    //1 view per player + 1 view full screen
     var views = {viewp1:view1, viewp2:view2, viewFull: view3};
+    //1 split screen + 1 full screen
     var projs = {projSplit:proj1, projFull: proj2};
 
     return {gl:gl,
-	    todraw: todraw,
-	    projs: projs,
-	    views: views};
+            todraw: todraw,
+            projs: projs,
+            views: views};
 }
 
-//renders the scene for one player, setting the viewport
-//and drawing the objects with the given view matrix
+//renders the scene for one player, setting the viewport and drawing the objects with the given view matrix
+//x is the start point of the screen to begin to draw ([0, width/2]; [width/2, width])
 function drawScene(gl, todraw, x, width, proj, view){
     gl.viewport(x, 0, width, gl.canvas.height);
 
@@ -391,10 +395,10 @@ function drawScene(gl, todraw, x, width, proj, view){
         });
 }
 
-//animates the scene by making every object of the game step
-//and calling drawScene() twice, once for each player
+//animates the scene by making every object of the game step and calling drawScene() twice, once for each player
 function animate(graphics){
 
+    //check collisions and moves paddles
     game.checkAndStep();
 
     if(twoPview){
@@ -429,6 +433,3 @@ function startup(graphics, angle){
         document.getElementById("spacebar").innerHTML = "";
     }
 }
-
-
-

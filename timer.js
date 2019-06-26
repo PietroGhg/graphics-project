@@ -38,12 +38,12 @@ function Decrement() {
         //if seconds becomes zero, then page alert time up
         if (mins < 0) {
             if (game.p1.points > game.p2.points){
-		if(playing)p1Win.play();
-		if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
+                if(playing)p1Win.play();
+                if(!alert('Game Over!\n\nP1 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
             }
             else if (game.p1.points < game.p2.points){
-		if(playing)p2Win.play();
-		if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
+                if(playing)p2Win.play();
+                if(!alert('Game Over!\n\nP2 Wins! 🏅🏆')){game.reset(); resetHTMLPoints();}
             }
             else {
                 if(playing)tie.play();
